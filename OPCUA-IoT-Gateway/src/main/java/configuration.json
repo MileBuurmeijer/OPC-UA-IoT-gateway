@@ -1,8 +1,8 @@
 {
     "serverConfiguration" : {
         "mqttConfig": {
-            "broker": "tcp://192.168.68.82:1883",
-            "username" : "mbuurmei",
+            "broker": "tcp://<ip-address & port>",
+            "username" : "<username>",
             "password" : "<mqtt password>"
         },
         "opcUaConfig" : {
