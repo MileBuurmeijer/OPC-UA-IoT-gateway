@@ -118,7 +118,7 @@ public class MqttController implements MqttMessageListener, Runnable{
                     messageIterator.remove();
                 }
             }
-            Waiter.waitMilliseconds(10); // wait 10 milliseconds
+            Waiter.waitMilliSeconds(10); // wait 10 milliseconds
         }
     }
     

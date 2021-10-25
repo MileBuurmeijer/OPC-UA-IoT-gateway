@@ -5,6 +5,8 @@
  */
 package name.buurmeijermile.smilesware.services.opcua.datasource;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -17,13 +19,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.Command;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.DeviceDiscoveryListener;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.MqttController;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.StatusUpdateListener;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.ControlledObject;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Controller;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.ControllerCommand;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Device;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.DeviceControllerTwin;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Parameter;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.RemoteCommand;
 import name.buurmeijermile.smilesware.services.opcua.utils.Waiter;
 import org.eclipse.milo.opcua.sdk.server.nodes.AttributeObserver;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaNode;
@@ -33,20 +39,25 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DateTime;
 import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
  *
  * @author Milé Buurmeijer <mbuurmei at netscape.net>
  */
-public class IoTDeviceBackendController implements DeviceDiscoveryListener, StatusUpdateListener, AttributeObserver {
+public class IoTDeviceBackendController implements DeviceDiscoveryListener, StatusUpdateListener, AttributeObserver, Runnable {
 
     private static final Logger LOGGER = Logger.getLogger( IoTDeviceBackendController.class.getName());
+    public static enum GRIPPERACTION { Open, Close};
     
     private final MqttController mqttController;
+    private final ObjectMapper mapper = new ObjectMapper();
+
     private DeviceControllerTwin controllerTwin;
     private List<DeviceControllerTwin> controllerTwinList = new ArrayList<>();
     private final Map<String, Parameter> variableProperties = new HashMap<>();
     private final ZoneOffset zoneOffset;
+    private List<RemoteControleCommand> receivedRemoteControllerCommands = new ArrayList<>();
     
     public IoTDeviceBackendController() {
         ZonedDateTime timezoneDateTime = ZonedDateTime.now(); // only used to retrieve platform timezone
@@ -69,6 +80,9 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
         // subscribe to all relevant update topics in the information model of thre remote device
         this.mqttController.createStatusUpdateSubscriptions(variableProperties.keySet());
         LOGGER.log( Level.INFO, "IoTDeviceBackendController initialized");
+        // start seperate thread for the active runtime work of this controller
+        Thread thread = new Thread(this);
+        thread.start();
     }
 
     @Override
@@ -114,11 +128,129 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
             UaVariableNode uaVariableNode = parameter.getUaVariableNode();
             Variant variant = new Variant( value); // TODO set proper data type
             LocalDateTime timestamp = LocalDateTime.now();
-            DataValue dataValue = new DataValue( variant, StatusCode.GOOD, this.getUaDateTime(), this.getUaDateTime());
+            DateTime now = this.getUaDateTime();
+            DataValue dataValue = new DataValue( variant, StatusCode.GOOD, now, now);
             uaVariableNode.setValue( dataValue);
             LOGGER.log( Level.INFO, "Parameter " + parameter.getGetTopic() + " gets value " + dataValue + " set");
         } else {
             LOGGER.log( Level.WARNING, "Parameter not found belonging to this topic " +  topic);
+        }
+    }
+    
+    public String receiveRemoteControlCommand( RemoteControleCommand aControllerCommand) {
+        this.receivedRemoteControllerCommands.add( aControllerCommand);
+        return "command request received";
+    }
+    
+    @Override
+    public void run() {
+        while (true) {
+            if (!this.receivedRemoteControllerCommands.isEmpty()) {
+                for (RemoteControleCommand aControllerCommand :  receivedRemoteControllerCommands) {
+                    processCommand( aControllerCommand);
+                }
+                this.receivedRemoteControllerCommands.clear();
+            }
+            Waiter.waitMilliSeconds(300);
+        }
+    }
+    
+    private void processCommand( RemoteControleCommand aControllerCommand) {
+        Controller controller = aControllerCommand.getController();
+        String command = aControllerCommand.getCommand();
+        switch (command) {
+            case "1": { 
+                this.runSequence( controller, 1);
+                break;
+            }
+            case "2": {
+                this.runSequence( controller, 2);
+                break;
+            }
+            default: {
+                LOGGER.log( Level.WARNING, "This command is not understood yet");
+            }
+        }
+    }
+
+    private void runSequence(Controller controller, int sequenceId) {
+        String result = "empty";
+        switch (sequenceId) {
+            case 1: {
+                this.moveRobotToDegrees( controller, 30.0,60.0,60.0); // set motor 0, 1 and 2
+                Waiter.waitADuration(Duration.ofSeconds(2));
+                this.gripAction( controller, GRIPPERACTION.Close, 20.0);
+                Waiter.waitADuration(Duration.ofSeconds(2));
+                this.moveRobotToDegrees( controller, 60.0,30.0,30.0); // set motor 0, 1 and 2
+                Waiter.waitADuration(Duration.ofSeconds(2));
+                this.gripAction( controller, GRIPPERACTION.Open, 160.0);
+                Waiter.waitADuration(Duration.ofSeconds(2));
+                result = "command 1 executed";
+                break;
+            }
+            case 2: {
+                this.moveRobotToDegrees( controller, 90.0,20.0,20.0); // set motor 0, 1 and 2
+                Waiter.waitADuration(Duration.ofSeconds(2));
+                this.gripAction( controller, GRIPPERACTION.Close, 50.0);
+                Waiter.waitADuration(Duration.ofSeconds(2));
+                this.moveRobotToDegrees( controller, 20.0,90.0,90.0); // set motor 0, 1 and 2
+                Waiter.waitADuration(Duration.ofSeconds(2));
+                this.gripAction( controller, GRIPPERACTION.Open, 120.0);
+                Waiter.waitADuration(Duration.ofSeconds(2));
+                result = "command 1 executed";
+                break;
+            }
+            default: {
+                LOGGER.log( Level.WARNING, "This should not have happened!!!");
+                break;
+            }
+        }
+    }
+
+    private void moveRobotToDegrees(Controller controller, double ... degreesArray) { // use -1 if that respective motor does not need to change
+        int motorNumber = 0;
+        RemoteCommand remoteCommand = new RemoteCommand();
+        List<ControllerCommand> controllerCommands = new ArrayList<>();
+        for (double degrees: degreesArray) {
+            if (degrees >= 0.0) {
+                ControlledObject controlledObject = new ControlledObject();
+                controlledObject.setDegrees( degrees);
+                controlledObject.setSpeed(0);
+                controlledObject.setId( motorNumber);
+                controlledObject.setType( "servo-motor");
+                ControllerCommand controllerCommand = new ControllerCommand();
+                controllerCommand.setControlledObject(controlledObject);
+                controllerCommands.add(controllerCommand);
+            }
+            motorNumber++;
+        }
+        remoteCommand.setControllerCommands( controllerCommands);
+        String jsonCommand = "";
+        try {
+            jsonCommand = mapper.writeValueAsString( remoteCommand);
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(IoTDeviceBackendController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        LOGGER.log(Level.INFO,"jsonCommand = " + jsonCommand);
+        if (jsonCommand != "") {
+            Command command = new Command( controller.getCommandTopic(), jsonCommand);
+            this.mqttController.sendRequest(command);
+        }
+    }
+
+    private void gripAction(Controller controller, GRIPPERACTION gripperAction, double degrees) {
+        switch (gripperAction) {
+            case Close: {
+                this.moveRobotToDegrees(controller, -0.1, -0.2, -0.3, -0.4, -0.5, degrees);
+                break;
+            }
+            case Open: {
+                this.moveRobotToDegrees(controller, -0.1, -0.2, -0.3, -0.4, -0.5, degrees);
+                break;
+            }
+            default: {
+                LOGGER.log(Level.WARNING, "This should not have happened!!");
+            }
         }
     }
 

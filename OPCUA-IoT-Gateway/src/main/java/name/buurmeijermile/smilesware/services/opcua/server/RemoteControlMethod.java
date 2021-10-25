@@ -25,7 +25,7 @@ package name.buurmeijermile.smilesware.services.opcua.server;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import name.buurmeijermile.opcuaservices.controllableplayer.measurements.DataControllerInterface;
+import name.buurmeijermile.smilesware.services.opcua.datasource.RemoteControleCommand;
 import org.eclipse.milo.opcua.sdk.core.ValueRanks;
 import org.eclipse.milo.opcua.sdk.server.api.methods.AbstractMethodInvocationHandler;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaMethodNode;
@@ -34,15 +34,18 @@ import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 import org.eclipse.milo.opcua.stack.core.types.structured.Argument;
+import name.buurmeijermile.smilesware.services.opcua.datasource.IoTDeviceBackendController;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Controller;
 
 public class RemoteControlMethod extends AbstractMethodInvocationHandler {
 
-//    private final DataControllerInterface dataController;
+    private final Controller controller;
+    private final IoTDeviceBackendController iotDeviceBackendController;
     
     // create the input argument
     public static final Argument COMMAND = new Argument(
         "control command",
-        Identifiers.Int32,
+        Identifiers.String,
         ValueRanks.Scalar,
         null,
         new LocalizedText("A control command number")
@@ -50,15 +53,16 @@ public class RemoteControlMethod extends AbstractMethodInvocationHandler {
     // create the output argument
     public static final Argument COMMANDRESULT = new Argument(
         "result",
-        Identifiers.Int32,
+        Identifiers.String,
         ValueRanks.Scalar,
         null,
         new LocalizedText("The result of the control command")
     );
     
-    public RemoteControlMethod( UaMethodNode aMethodNode /**, DataControllerInterface aDataController**/) {
+    public RemoteControlMethod( UaMethodNode aMethodNode, IoTDeviceBackendController aIoTDeviceBackendController, Controller aController) {
         super( aMethodNode);
-//        this.dataController = aDataController;
+        this.controller = aController; // the digital twin of the controller inside the IoT device
+        this.iotDeviceBackendController = aIoTDeviceBackendController; // the back end controller of this OPC UA server controller the remote IoT device
     }
 
     @Override
@@ -75,12 +79,14 @@ public class RemoteControlMethod extends AbstractMethodInvocationHandler {
     protected Variant[] invoke(InvocationContext invocationContext, Variant[] inputValues) throws UaException {
         Logger.getLogger( RemoteControlMethod.class.getName()).log(Level.FINE, "Invoking command() method of objectId={}", invocationContext.getObjectId());
 
-        int command = (int) inputValues[0].getValue();
+        String command = inputValues[0].getValue().toString();
+        
+        RemoteControleCommand controllerCommand = new RemoteControleCommand( this.controller, command);
 
         Logger.getLogger(RemoteControlMethod.class.getName()).log(Level.FINE, "control(" + command + ")");
         Logger.getLogger(RemoteControlMethod.class.getName()).log(Level.FINE, "Invoking control() method of Object '" + invocationContext.getMethodNode().getBrowseName().getName() + "'");
 
-        Integer commandResult = this.dataController.doRemotePlayerControl( command);
+        String commandResult = this.iotDeviceBackendController.receiveRemoteControlCommand( controllerCommand);
 
         return new Variant[]{new Variant(commandResult)};   
     }

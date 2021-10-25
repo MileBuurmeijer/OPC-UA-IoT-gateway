@@ -74,10 +74,10 @@ public class Waiter {
         int nanoseconds = duration.getNano();
         long milliseconds = Math.round(nanoseconds / 1000000.0); // convert nanoseconds to milliseconds
         milliseconds = milliseconds + seconds * 1000; // and add seconds converted to milliseconds to them
-        Waiter.waitMilliseconds( milliseconds);
+        Waiter.waitMilliSeconds( milliseconds);
     }
     
-    public static void waitMilliseconds( long milliseconds) {
+    public static void waitMilliSeconds( long milliseconds) {
          try {
             Thread.sleep( milliseconds);
         } catch (InterruptedException ex) {

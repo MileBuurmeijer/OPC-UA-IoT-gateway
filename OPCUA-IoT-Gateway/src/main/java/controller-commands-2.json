@@ -1,0 +1,26 @@
+{
+    "controller-commands": [
+        {
+            "controlled-object": {
+                "id": 2,
+                "type": "servo-motor",
+                "speed": 0,
+                "degrees": 60.0
+            }
+        }, {
+            "controlled-object": {
+                "id": 2,
+                "type": "servo-motor",
+                "speed": 0,
+                "degrees": 60.0
+            }
+        }, {
+            "controlled-object": {
+                "id": 2,
+                "type": "servo-motor",
+                "speed": 0,
+                "degrees": 60.0
+            }
+        }
+    ]
+}

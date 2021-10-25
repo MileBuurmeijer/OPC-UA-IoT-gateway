@@ -126,14 +126,12 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
     }
 
     protected void onStartup() {
-        int ioTdeviceCount = 0;
         for (DeviceControllerTwin aTwin : this.dataBackendController.getControllerTwins()) {
-            this.addDevicesToNameSpace(aTwin, ioTdeviceCount);
-            ioTdeviceCount++;
+            this.addDevicesToNameSpace(aTwin);
         }
     }
     
-    private void addDevicesToNameSpace( DeviceControllerTwin aTwin, int iotDeviceCount) {
+    private void addDevicesToNameSpace( DeviceControllerTwin aTwin) {
         Controller controller = aTwin.getController();
         String controllerNodeIDString = controller.getName() + "/" + controller.getId() ;
         UaFolderNode controllerFolder = new UaFolderNode(
@@ -142,7 +140,7 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
                 newQualifiedName( controllerNodeIDString),
                 LocalizedText.english( controllerNodeIDString)
         );
-        // add node to nodes
+        // add controller folder to nodes
         this.getNodeManager().addNode(controllerFolder);
         // and into the folder structure under root/objects by adding a reference to it
         controllerFolder.addReference(new Reference(
@@ -151,6 +149,8 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
                 Identifiers.ObjectsFolder.expanded(),
                 false
         ));
+        // add remote command method to this folder
+        this.addRemoteControlMethodNode( controller, controllerFolder);
         // add all devices from this controller
         for (Device device : controller.getDevices()) {
             String deviceNodeIDString = device.getName() + "/" + device.getId();
@@ -242,69 +242,71 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
             }
         }
     }
-    private void addRemoteControlMethodNode() {
-        String PLAYERCONTROLFOLDER = "remote-command";
+    
+    // todo: update this merge from another project (OPC UA Player)
+    private void addRemoteControlMethodNode( Controller controller, UaFolderNode controllerFolder) {
+        String parentFolderName = controllerFolder.getBrowseName().getName();
         try {
-            // create a "PlayerControl" folder and add it to the node manager
-            NodeId remoteControlNodeId = this.newNodeId(PLAYERCONTROLFOLDER);
-            UaFolderNode remoteControlFolderNode = new UaFolderNode(
-                    this.getNodeContext(),
-                    remoteControlNodeId,
-                    this.newQualifiedName(PLAYERCONTROLFOLDER),
-                    LocalizedText.english(PLAYERCONTROLFOLDER)
-            );
-            // add this method node to servers node map
-            this.getNodeManager().addNode(remoteControlFolderNode);
-            // and into the folder structure under root/objects by adding a reference to it
-            remoteControlFolderNode.addReference(new Reference(
-                    remoteControlFolderNode.getNodeId(),
-                    Identifiers.Organizes,
-                    Identifiers.ObjectsFolder.expanded(),
-                    false
-            ));
+//            // create a "PlayerControl" folder and add it to the node manager
+//            NodeId remoteControlNodeId = this.newNodeId(parentFolderName);
+//            UaFolderNode remoteControlFolderNode = new UaFolderNode(
+//                    this.getNodeContext(),
+//                    remoteControlNodeId,
+//                    this.newQualifiedName(parentFolderName),
+//                    LocalizedText.english(parentFolderName)
+//            );
+//            // add this method node to servers node map
+//            this.getNodeManager().addNode(remoteControlFolderNode);
+//            // and into the folder structure under root/objects by adding a reference to it
+//            remoteControlFolderNode.addReference(new Reference(
+//                    remoteControlFolderNode.getNodeId(),
+//                    Identifiers.Organizes,
+//                    Identifiers.ObjectsFolder.expanded(),
+//                    false
+//            ));
             // bulld the method node
             UaMethodNode methodNode = UaMethodNode.builder(this.getNodeContext())
-                    .setNodeId(newNodeId(PLAYERCONTROLFOLDER + "/remote-control(x)"))
+                    .setNodeId(newNodeId(parentFolderName + "/remote-control(x)"))
                     .setBrowseName(newQualifiedName("remote-control(x)"))
                     .setDisplayName(new LocalizedText(null, "remote-control(x)"))
                     .setDescription(
                             LocalizedText.english("Remote command to an attached controller"))
                     .build();
             // add an invocation handler point towards the control method and the actual class that can be 'controlled'
-            RemoteControlMethod remoteControlMethod = new RemoteControlMethod(methodNode, this.dataController);
+            RemoteControlMethod remoteControlMethod = new RemoteControlMethod(methodNode, this.dataBackendController, controller);
             // set the method input and output properties and the created invocation handler
             methodNode.setInputArguments(remoteControlMethod.getInputArguments());
             methodNode.setOutputArguments(remoteControlMethod.getOutputArguments());
             methodNode.setInvocationHandler(remoteControlMethod);
             // add the method node to the namespace
             this.getNodeManager().addNode(methodNode);
-            // and add a reference to the created folder node refering to the method node   
+            // and add a reference to the controller parent folder node refering to the method node   
             methodNode.addReference(new Reference(
-                    methodNode.getNodeId(),
-                    Identifiers.HasComponent,
-                    remoteControlFolderNode.getNodeId().expanded(),
+                    methodNode.getNodeId(), // source nodeid
+                    Identifiers.HasComponent, // type
+                    controllerFolder.getNodeId().expanded(), // target nodeid
                     false
             ));
-            // add in same folder a varaiable node that shows the current state
-            String nodeName = "RunState";
-            // create variable node
-            UaVariableNode runStateVariableNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
-                .setNodeId(newNodeId(PLAYERCONTROLFOLDER + "/" + nodeName))
-                .setAccessLevel(AccessLevel.READ_ONLY)
-                .setUserAccessLevel(AccessLevel.READ_ONLY)
-                .setBrowseName(newQualifiedName(nodeName))
-                .setDisplayName(LocalizedText.english(nodeName))
-                .setDataType(Identifiers.String)
-                .setTypeDefinition(Identifiers.BaseDataVariableType)
-                .build();
-            // make this varable node known to data backend controller so that it can updates to the runstate into this node
-            this.dataController.setRunStateUANode(runStateVariableNode);
-            // add node to server mapRunState"
-            this.getNodeManager().addNode(runStateVariableNode);
-            // add node to this player folder
-            remoteControlFolderNode.addOrganizes(runStateVariableNode);
+//            // add in same folder a variable node that shows the current state
+//            String nodeName = "RemoteCommand";
+//            // create variable node
+//            UaVariableNode runStateVariableNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
+//                .setNodeId(newNodeId(parentFolderName + "/" + nodeName))
+//                .setAccessLevel(AccessLevel.READ_ONLY)
+//                .setUserAccessLevel(AccessLevel.READ_ONLY)
+//                .setBrowseName(newQualifiedName(nodeName))
+//                .setDisplayName(LocalizedText.english(nodeName))
+//                .setDataType(Identifiers.String)
+//                .setTypeDefinition(Identifiers.BaseDataVariableType)
+//                .build();
+//            // make this varable node known to data backend controller so that it can updates to the runstate into this node
+//            //this.dataController.setRunStateUANode(runStateVariableNode);
+//            // add node to server mapRunState"
+//            this.getNodeManager().addNode(runStateVariableNode);
+//            // add node to this player folder
+//            controllerFolder.addOrganizes(runStateVariableNode);
         } catch (NumberFormatException ex) {
-            Logger.getLogger(PlayerNamespace.class.getName()).log(Level.SEVERE, "number format wrong: " + ex.getMessage(), ex);
+            Logger.getLogger(IoTDeviceGatewayNamespace.class.getName()).log(Level.SEVERE, "number format wrong: " + ex.getMessage(), ex);
         }
     }
 
