@@ -1,0 +1,112 @@
+{
+    "controller": {
+        "command-topic": "IntelligentIndustryExperience/controller/0/set/command",
+        "state-topic": "IntelligentIndustryExperience/controller/0/get/status",
+        "name": "controller",
+        "id": "0",
+        "devices": [
+            {
+                "name": "servo-motor",
+                "id": "0",
+                "type": 1,
+                "parameters": [
+                    {
+                        "name": "speed",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/get/speed",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/set/speed"
+                    },
+                    {
+                        "name": "degrees",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/get/degrees",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/set/degrees"
+                    }
+                ]
+            },
+            {
+                "name": "servo-motor",
+                "id": "1",
+                "type": 1,
+                "parameters": [
+                    {
+                        "name": "speed",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/get/speed",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/set/speed"
+                    },
+                    {
+                        "name": "degrees",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/get/degrees",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/set/degrees"
+                    }
+                ]
+            },
+            {
+                "name": "servo-motor",
+                "id": "2",
+                "type": 1,
+                "parameters": [
+                    {
+                        "name": "speed",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/get/speed",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/set/speed"
+                    },
+                    {
+                        "name": "degrees",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/get/degrees",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/set/degrees"
+                    }
+                ]
+            },
+            {
+                "name": "servo-motor",
+                "id": "3",
+                "type": 1,
+                "parameters": [
+                    {
+                        "name": "speed",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/get/speed",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/set/speed"
+                    },
+                    {
+                        "name": "degrees",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/get/degrees",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/set/degrees"
+                    }
+                ]
+            },
+            {
+                "name": "servo-motor",
+                "id": "4",
+                "type": 1,
+                "parameters": [
+                    {
+                        "name": "speed",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/get/speed",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/set/speed"
+                    },
+                    {
+                        "name": "degrees",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/get/degrees",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/set/degrees"
+                    }
+                ]
+            },
+            {
+                "name": "servo-motor",
+                "id": "5",
+                "type": 1,
+                "parameters": [
+                    {
+                        "name": "speed",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/get/speed",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/set/speed"
+                    },
+                    {
+                        "name": "degrees",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/get/degrees",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/set/degrees"
+                    }
+                ]
+            }
+        ]
+    }
+}

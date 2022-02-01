@@ -1,0 +1,99 @@
+{
+  "controller-state": {
+    "controller-name": "controller",
+    "controller-id": "0",
+    "state-name": "DemoTask[2].action[17]",
+    "devices": [
+      {
+        "name": "servo-motor",
+        "id": "0",
+        "type": 1,
+        "parameters": [
+          {
+            "name": "speed",
+            "value": "1.00"
+          },
+          {
+            "name": "degrees",
+            "value": "45.00"
+          }
+        ]
+      },
+      {
+        "name": "servo-motor",
+        "id": "1",
+        "type": 1,
+        "parameters": [
+          {
+            "name": "speed",
+            "value": "1.00"
+          },
+          {
+            "name": "degrees",
+            "value": "139.00"
+          }
+        ]
+      },
+      {
+        "name": "servo-motor",
+        "id": "2",
+        "type": 1,
+        "parameters": [
+          {
+            "name": "speed",
+            "value": "1.00"
+          },
+          {
+            "name": "degrees",
+            "value": "0.00"
+          }
+        ]
+      },
+      {
+        "name": "servo-motor",
+        "id": "3",
+        "type": 1,
+        "parameters": [
+          {
+            "name": "speed",
+            "value": "1.00"
+          },
+          {
+            "name": "degrees",
+            "value": "0.00"
+          }
+        ]
+      },
+      {
+        "name": "servo-motor",
+        "id": "4",
+        "type": 1,
+        "parameters": [
+          {
+            "name": "speed",
+            "value": "1.00"
+          },
+          {
+            "name": "degrees",
+            "value": "0.00"
+          }
+        ]
+      },
+      {
+        "name": "servo-motor",
+        "id": "5",
+        "type": 1,
+        "parameters": [
+          {
+            "name": "speed",
+            "value": "1.00"
+          },
+          {
+            "name": "degrees",
+            "value": "159.77"
+          }
+        ]
+      }
+    ]
+  }
+}

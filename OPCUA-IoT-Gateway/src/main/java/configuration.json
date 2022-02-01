@@ -1,0 +1,13 @@
+{
+    "serverConfiguration" : {
+        "mqttConfig": {
+            "broker": "tcp://<ip-address & port>",
+            "username" : "<username>",
+            "password" : "<mqtt password>"
+        },
+        "opcUaConfig" : {
+            "startNode"  : "ns=0;i=85",
+            "serverPort" : 12000
+        }
+    }
+}
