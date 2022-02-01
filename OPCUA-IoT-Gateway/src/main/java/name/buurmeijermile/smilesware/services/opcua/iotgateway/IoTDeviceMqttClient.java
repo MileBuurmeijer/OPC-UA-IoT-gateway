@@ -77,8 +77,8 @@ public class IoTDeviceMqttClient implements MqttCallback {
     
     public void publishMessage( String topic, String messageToSend) {
         try {
-            System.out.println("Publishing to topic: " + topic);
-            System.out.println("Publishing message: " + messageToSend);
+//            System.out.println("Publishing to topic: " + topic);
+//            System.out.println("Publishing message: " + messageToSend);
             MqttMessage mqttMessage = new MqttMessage(messageToSend.getBytes());
             mqttMessage.setQos(qos);
             mqttClient.publish(topic, mqttMessage);

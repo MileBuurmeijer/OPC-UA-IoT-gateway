@@ -5,7 +5,7 @@
  */
 package name.buurmeijermile.smilesware.services.opcua.iotgateway;
 
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.DeviceControllerTwin;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.RemoteControllerTwin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -27,9 +27,9 @@ public class MqttController implements MqttMessageListener, Runnable{
     private final IoTDeviceMqttClient mqttClient;
     private final String commandTopic = "IntelligentIndustryExperience/controller/set/command";
     private final String informationModelTopic = "IntelligentIndustryExperience/controller/get/informationModel";
-    public final Command getInformationModelCommand = new Command(commandTopic, "{ \"get\": \"model\" } "); // any JSON Object would do for now
+    public final RemoteControllerCommandMessage getInformationModelCommand = new RemoteControllerCommandMessage(commandTopic, "{ \"get\": \"model\" } "); // any JSON Object would do for now
     private final List<MqttTopicMessage> messageQueue = new ArrayList<>();
-//    private DeviceControllerTwin controllerTwin = null;
+//    private RemoteControllerTwin controllerTwin = null;
     private final ObjectMapper mapper = new ObjectMapper();
     private boolean running = false;
     private List<StatusUpdateListener> statusUpdateListeners = new ArrayList<>();
@@ -63,7 +63,7 @@ public class MqttController implements MqttMessageListener, Runnable{
         topics.stream().forEach(topic -> this.mqttClient.createSubscription( topic));
     }
     
-    public void sendRequest( Command command) {
+    public void sendRequest( RemoteControllerCommandMessage command) {
         this.mqttClient.publishMessage(
                 command.getTopic(), 
                 command.getCommand()
@@ -79,7 +79,7 @@ public class MqttController implements MqttMessageListener, Runnable{
                 LOGGER.log( Level.INFO, "json formatted information model received from target device:");
                 LOGGER.log( Level.INFO, jsonInformationModel);
                 try {
-                    DeviceControllerTwin controllerTwin = mapper.readValue( jsonInformationModel, DeviceControllerTwin.class);
+                    RemoteControllerTwin controllerTwin = mapper.readValue(jsonInformationModel, RemoteControllerTwin.class);
                     LOGGER.log( Level.INFO, "Twin created for remote iot device controller");
                     for (DeviceDiscoveryListener listener : this.deviceDiscoveryListeners ) {
                         listener.receiveDeviceDiscoveryEvent( controllerTwin);
@@ -154,7 +154,7 @@ public class MqttController implements MqttMessageListener, Runnable{
         this.running = false;
     }
 //
-//    public DeviceControllerTwin getDeviceControllerTwin() {
+//    public RemoteControllerTwin getDeviceControllerTwin() {
 //        return controllerTwin;
 //    }
 

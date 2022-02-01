@@ -9,11 +9,11 @@ package name.buurmeijermile.smilesware.services.opcua.iotgateway;
  *
  * @author Milé Buurmeijer <mbuurmei at netscape.net>
  */
-public class Command {
+public class RemoteControllerCommandMessage {
     private final String command;
     private final String topic;
     
-    public Command( String aTopic, String aJsonCommandString) {
+    public RemoteControllerCommandMessage( String aTopic, String aJsonCommandString) {
         command = aJsonCommandString;
         topic = aTopic;
     }

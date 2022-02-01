@@ -1,4 +1,4 @@
-package name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects;
+package name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel;
 
 import java.util.HashMap;
 import java.util.Map;

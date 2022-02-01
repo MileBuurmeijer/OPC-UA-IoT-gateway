@@ -271,6 +271,7 @@ public class Configuration {
                 for (Option anOption : options.getOptions()) {
                     logger.info( "- " + anOption.getOpt() + " => " + anOption.getDescription());
                 }
+                logger.info("Please try again with the given command line options above");
                 // and exit the VM
                 System.exit( ExitCode.NORMAL.ordinal());
             }
@@ -293,7 +294,7 @@ public class Configuration {
                         System.exit( ExitCode.WRONGMODE.ordinal()); // exit application with proper exit code
                     }
                 }
-            } // no else needed becaause its an optional argument and the default mode is Player
+            } // no else needed because its an optional argument and the default mode is Player
             logger.log( Level.INFO, "Mode: " + this.mode.name());
             // ===> generic commands for both player as well as recorder mode <===
             // check if autostart command is present

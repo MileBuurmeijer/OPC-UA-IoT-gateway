@@ -5,12 +5,12 @@
  */
 package name.buurmeijermile.smilesware.services.opcua.iotgateway;
 
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.DeviceControllerTwin;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.RemoteControllerTwin;
 
 /**
  *
  * @author Milé Buurmeijer <mbuurmei at netscape.net>
  */
 public interface DeviceDiscoveryListener {
-    public void receiveDeviceDiscoveryEvent( DeviceControllerTwin aTwin);
+    public void receiveDeviceDiscoveryEvent( RemoteControllerTwin aTwin);
 }

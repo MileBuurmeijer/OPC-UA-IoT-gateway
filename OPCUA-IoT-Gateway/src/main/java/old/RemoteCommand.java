@@ -1,6 +1,7 @@
 
-package name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects;
+package old;
 
+import old.ControllerCommand;
 import java.util.List;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;

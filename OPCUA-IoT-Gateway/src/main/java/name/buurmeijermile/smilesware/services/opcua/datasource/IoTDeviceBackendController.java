@@ -19,17 +19,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.Command;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.DeviceDiscoveryListener;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.MqttController;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.RemoteControllerCommandMessage;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.StatusUpdateListener;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.ControlledObject;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Controller;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.ControllerCommand;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Device;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.DeviceControllerTwin;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Parameter;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.RemoteCommand;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.RemoteControllerTwin;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Controller;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Sensuator;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Parameter;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.ActionCommand;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.Task;
 import name.buurmeijermile.smilesware.services.opcua.utils.Waiter;
 import org.eclipse.milo.opcua.sdk.server.nodes.AttributeObserver;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaNode;
@@ -39,7 +38,6 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DateTime;
 import org.eclipse.milo.opcua.stack.core.types.builtin.StatusCode;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
  *
@@ -48,16 +46,16 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 public class IoTDeviceBackendController implements DeviceDiscoveryListener, StatusUpdateListener, AttributeObserver, Runnable {
 
     private static final Logger LOGGER = Logger.getLogger( IoTDeviceBackendController.class.getName());
-    public static enum GRIPPERACTION { Open, Close};
     
     private final MqttController mqttController;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private DeviceControllerTwin controllerTwin;
-    private List<DeviceControllerTwin> controllerTwinList = new ArrayList<>();
-    private final Map<String, Parameter> variableProperties = new HashMap<>();
+    private RemoteControllerTwin controllerTwin;
+    private List<RemoteControllerTwin> remoteControllerTwinList = new ArrayList<>();
+    private final Map<String, Parameter> remoteControllerProperties = new HashMap<>();
     private final ZoneOffset zoneOffset;
-    private List<RemoteControleCommand> receivedRemoteControllerCommands = new ArrayList<>();
+    private List<RemoteControllerCommand> receivedRemoteControllerCommands = new ArrayList<>();
+    private TaskController taskController;
     
     public IoTDeviceBackendController() {
         ZonedDateTime timezoneDateTime = ZonedDateTime.now(); // only used to retrieve platform timezone
@@ -71,73 +69,112 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
         this.mqttController.addDeviceDiscoveryListener(this);
         mqttController.init();
         mqttController.start();
-        // wait for the device controller twins to appear (those will occur when iotdevices report their information models to the MqttController)
+        // wait for the remote IoT controller twins to appear (those will occur when iotdevices report their information models to the MqttController)
         LOGGER.log( Level.INFO, "IoTDeviceBackendController waiting for controllers to report information models");
         Waiter.waitADuration( Duration.ofSeconds(20)); // wait 20 seconds for them to respond
         LOGGER.log( Level.INFO, "IoTDeviceBackendController waiting passed");
-        // gather all properties of all reported devices
-        this.initVariableProperties();
-        // subscribe to all relevant update topics in the information model of thre remote device
-        this.mqttController.createStatusUpdateSubscriptions(variableProperties.keySet());
+        // gather all properties of the reported IoT controllers
+        this.initRemoteControllerProperties();
+        // subscribe to all relevant update topics in the information model of the remote device
+        this.mqttController.createStatusUpdateSubscriptions(remoteControllerProperties.keySet());
         LOGGER.log( Level.INFO, "IoTDeviceBackendController initialized");
         // start seperate thread for the active runtime work of this controller
-        Thread thread = new Thread(this);
-        thread.start();
-    }
-
-    @Override
-    public void receiveDeviceDiscoveryEvent(DeviceControllerTwin aTwin) {
-        LOGGER.log( Level.INFO, "DeviceControllerTwin received");
-        this.controllerTwinList.add(aTwin);
+        Thread backendThreadhread = new Thread(this);
+        backendThreadhread.start();
+        // create task controller for dealing with tasks and action for the remote controller (and the learning procedure)
+        taskController = new TaskController( this);
+        // initialize it with its capability set of tasks that it understands
+        taskController.initialize();
+        // and its operational thread
+        Thread taskControllerThread = new Thread( taskController);
+        taskControllerThread.start();
     }
     
-    public void initVariableProperties() {
-        LOGGER.log( Level.INFO, "Initializing variable properties");
-        for ( DeviceControllerTwin aDeviceTwin : this.controllerTwinList) {
-            Controller controller = aDeviceTwin.getController();
+    public void initRemoteControllerProperties() {
+        LOGGER.log( Level.INFO, "Initializing remote controller properties");
+        // per devicetwin that reported itself
+        for ( RemoteControllerTwin aRemoteControllerTwin : this.getRemoteControllerTwinList()) {
+            // get the underlying controller object
+            Controller controller = aRemoteControllerTwin.getController();
+            // create a state parameter for in the variable properties
+            String controllerStateTopic = controller.getStateTopic();
+            String controllerCommandTopic = controller.getCommandTopic();
+            Parameter stateParameter = new Parameter();
+            stateParameter.setName(Controller.STATEKEYWORD);
+            stateParameter.setGetTopic(controllerStateTopic);
+            stateParameter.setSetTopic(controllerCommandTopic);
+            LOGGER.log( Level.INFO, "Adding parameter[" + stateParameter.getName() + "] with getTopic[" + stateParameter.getGetTopic() + "] and setTopic[" + stateParameter.getSetTopic() + "]");
+            this.remoteControllerProperties.put(controllerStateTopic, stateParameter);
             // iterate through all devices from this controller
-            for (Device device : controller.getDevices()) {
+            for (Sensuator sensuator : controller.getSensuators()) {
                 // add dynamic properties to the device
-                for (Parameter parameter : device.getParameters()) {
+                for (Parameter parameter : sensuator.getParameters()) {
                     // add both the get and set properties so that this map
-                    // can be use to lookup get and set topics
-                    this.variableProperties.put( parameter.getGetTopic(), parameter);
-                    this.variableProperties.put( parameter.getSetTopic(), parameter);
+                    // can be use to lookup the get and set topics
+                    this.remoteControllerProperties.put( parameter.getGetTopic(), parameter);
+                    this.remoteControllerProperties.put( parameter.getSetTopic(), parameter);
                     LOGGER.log( Level.INFO, "Adding parameter[" + parameter.getName() + "] with getTopic[" + parameter.getGetTopic() + "] and setTopic[" + parameter.getSetTopic() + "]");
                 }
             }
         }
-        LOGGER.log( Level.INFO, "Variable properties initialized");
+        LOGGER.log( Level.INFO, "Remote Controller properties initialized");
     }
-    
-    public void setPropertyValue( String topic, double value) {
-        
-    }
-    
-    public List<DeviceControllerTwin> getControllerTwins() {
-        return this.controllerTwinList;
+
+    /**
+     * This back end controller listens to device discovery events to build up the OPC UA model
+     * for this OPCU UA server as well as being able to interact with the remote device controller.
+     * @param aTwin 
+     */
+    @Override
+    public void receiveDeviceDiscoveryEvent(RemoteControllerTwin aTwin) {
+        LOGGER.log( Level.INFO, "DeviceControllerTwin received");
+        this.getRemoteControllerTwinList().add(aTwin);
     }
 
     @Override
     public void receiveUpdate(String topic, String value) {
         // find the property belonging to this topic, as used at subscribing to these topics
         LOGGER.log( Level.INFO, "Received update: topic[" + topic + "]=" + value);
-        Parameter parameter = this.variableProperties.get(topic);
+        Parameter parameter = this.remoteControllerProperties.get(topic);
+        UaVariableNode uaVariableNode;
         if (parameter != null) {
+            // check if it is status of controller instead of real parameters of sensors / actuators
+            if (parameter.getName().contentEquals(Controller.STATEKEYWORD)) {
+                // get the controller of which state we received an state update
+                Controller controller = this.getControllerByTopic(topic);
+                if (controller != null) {
+                    // update the the corresponding OPC UA variable node in the namespace of the OPC UA Server
+                    uaVariableNode = controller.getUaVariableNode();
+                    // process the message to so that the received controller state is captured
+                    this.processRemoteControllerState( topic, value);
+                } else {
+                    uaVariableNode = null;
+                }
+            } else {
+                uaVariableNode=parameter.getUaVariableNode();
+            }
             // get the UA variable to set its value
-            UaVariableNode uaVariableNode = parameter.getUaVariableNode();
-            Variant variant = new Variant( value); // TODO set proper data type
-            LocalDateTime timestamp = LocalDateTime.now();
-            DateTime now = this.getUaDateTime();
-            DataValue dataValue = new DataValue( variant, StatusCode.GOOD, now, now);
-            uaVariableNode.setValue( dataValue);
-            LOGGER.log( Level.INFO, "Parameter " + parameter.getGetTopic() + " gets value " + dataValue + " set");
+            if (uaVariableNode != null) {
+                Variant variant = new Variant( value); // TODO set proper data type
+                LocalDateTime timestamp = LocalDateTime.now();
+                DateTime now = this.getUaDateTime();
+                DataValue dataValue = new DataValue( variant, StatusCode.GOOD, now, now);
+                uaVariableNode.setValue( dataValue);
+                LOGGER.log( Level.INFO, "Parameter " + parameter.getGetTopic() + " gets value " + dataValue + " set");
+            } else {
+                LOGGER.log( Level.WARNING, "Controller state not found belonging to this topic " +  topic);
+            }
         } else {
+            // check the non parametric topics that this back end controller is subscribed to
             LOGGER.log( Level.WARNING, "Parameter not found belonging to this topic " +  topic);
         }
     }
     
-    public String receiveRemoteControlCommand( RemoteControleCommand aControllerCommand) {
+    private void processRemoteControllerState(String topic, String value) {
+        this.taskController.processMessage(topic, value);
+    }
+
+    public String receiveRemoteControlCommand( RemoteControllerCommand aControllerCommand) {
         this.receivedRemoteControllerCommands.add( aControllerCommand);
         return "command request received";
     }
@@ -146,8 +183,8 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
     public void run() {
         while (true) {
             if (!this.receivedRemoteControllerCommands.isEmpty()) {
-                for (RemoteControleCommand aControllerCommand :  receivedRemoteControllerCommands) {
-                    processCommand( aControllerCommand);
+                for (RemoteControllerCommand aControllerCommand :  receivedRemoteControllerCommands) {
+                    processRemoteControllerCommand( aControllerCommand);
                 }
                 this.receivedRemoteControllerCommands.clear();
             }
@@ -155,103 +192,77 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
         }
     }
     
-    private void processCommand( RemoteControleCommand aControllerCommand) {
+    private void processRemoteControllerCommand( RemoteControllerCommand aControllerCommand) {
         Controller controller = aControllerCommand.getController();
         String command = aControllerCommand.getCommand();
+        int requestTaskResult = 0;
         switch (command) {
             case "1": { 
-                this.runSequence( controller, 1);
+                requestTaskResult = this.taskController.requestTask( "move-item-1");
                 break;
             }
             case "2": {
-                this.runSequence( controller, 2);
+                requestTaskResult = this.taskController.requestTask( "move-item-2");
+                break;
+            }
+            case "3": {
+                requestTaskResult = this.taskController.requestTask( "move-item-3");
                 break;
             }
             default: {
                 LOGGER.log( Level.WARNING, "This command is not understood yet");
             }
         }
+        LOGGER.log(Level.INFO, "Task request result = {0}", requestTaskResult);
     }
-
-    private void runSequence(Controller controller, int sequenceId) {
-        String result = "empty";
-        switch (sequenceId) {
-            case 1: {
-                this.moveRobotToDegrees( controller, 30.0,60.0,60.0); // set motor 0, 1 and 2
-                Waiter.waitADuration(Duration.ofSeconds(2));
-                this.gripAction( controller, GRIPPERACTION.Close, 20.0);
-                Waiter.waitADuration(Duration.ofSeconds(2));
-                this.moveRobotToDegrees( controller, 60.0,30.0,30.0); // set motor 0, 1 and 2
-                Waiter.waitADuration(Duration.ofSeconds(2));
-                this.gripAction( controller, GRIPPERACTION.Open, 160.0);
-                Waiter.waitADuration(Duration.ofSeconds(2));
-                result = "command 1 executed";
-                break;
-            }
-            case 2: {
-                this.moveRobotToDegrees( controller, 90.0,20.0,20.0); // set motor 0, 1 and 2
-                Waiter.waitADuration(Duration.ofSeconds(2));
-                this.gripAction( controller, GRIPPERACTION.Close, 50.0);
-                Waiter.waitADuration(Duration.ofSeconds(2));
-                this.moveRobotToDegrees( controller, 20.0,90.0,90.0); // set motor 0, 1 and 2
-                Waiter.waitADuration(Duration.ofSeconds(2));
-                this.gripAction( controller, GRIPPERACTION.Open, 120.0);
-                Waiter.waitADuration(Duration.ofSeconds(2));
-                result = "command 1 executed";
-                break;
-            }
-            default: {
-                LOGGER.log( Level.WARNING, "This should not have happened!!!");
-                break;
-            }
-        }
-    }
-
-    private void moveRobotToDegrees(Controller controller, double ... degreesArray) { // use -1 if that respective motor does not need to change
-        int motorNumber = 0;
-        RemoteCommand remoteCommand = new RemoteCommand();
-        List<ControllerCommand> controllerCommands = new ArrayList<>();
-        for (double degrees: degreesArray) {
-            if (degrees >= 0.0) {
-                ControlledObject controlledObject = new ControlledObject();
-                controlledObject.setDegrees( degrees);
-                controlledObject.setSpeed(0);
-                controlledObject.setId( motorNumber);
-                controlledObject.setType( "servo-motor");
-                ControllerCommand controllerCommand = new ControllerCommand();
-                controllerCommand.setControlledObject(controlledObject);
-                controllerCommands.add(controllerCommand);
-            }
-            motorNumber++;
-        }
-        remoteCommand.setControllerCommands( controllerCommands);
+        
+    public void sendRemoteCommand( ActionCommand anActionCommand) {
         String jsonCommand = "";
         try {
-            jsonCommand = mapper.writeValueAsString( remoteCommand);
+            // prep action command for setting the state of the remote controller
+            anActionCommand.setSet("state");
+            // map the controller-state part of the action command
+            jsonCommand = mapper.writeValueAsString( anActionCommand);
         } catch (JsonProcessingException ex) {
             Logger.getLogger(IoTDeviceBackendController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        LOGGER.log(Level.INFO,"jsonCommand = " + jsonCommand);
-        if (jsonCommand != "") {
-            Command command = new Command( controller.getCommandTopic(), jsonCommand);
-            this.mqttController.sendRequest(command);
+        LOGGER.log(Level.INFO, "jsonCommand = {0}", jsonCommand);
+        if (!jsonCommand.contentEquals("")) {
+            // find the controller from the remote information model objects
+            Controller aController = this.getControllerById( anActionCommand.getControllerState().getControllerId());
+            if (aController != null) {
+                // create a remote controller command meesage
+                RemoteControllerCommandMessage commandMessage = new RemoteControllerCommandMessage( aController.getCommandTopic(), jsonCommand);
+                // and ask mqtt controller to send it
+                this.mqttController.sendRequest(commandMessage);
+                LOGGER.log(Level.INFO, "jsonCommand send to mqtt controller");
+            } else {
+                LOGGER.log(Level.WARNING, "Controller not found to send message to");
+            }
+        } else {
+            LOGGER.log( Level.WARNING, "Empty string after JSON object mapping");
         }
     }
 
-    private void gripAction(Controller controller, GRIPPERACTION gripperAction, double degrees) {
-        switch (gripperAction) {
-            case Close: {
-                this.moveRobotToDegrees(controller, -0.1, -0.2, -0.3, -0.4, -0.5, degrees);
-                break;
-            }
-            case Open: {
-                this.moveRobotToDegrees(controller, -0.1, -0.2, -0.3, -0.4, -0.5, degrees);
-                break;
-            }
-            default: {
-                LOGGER.log(Level.WARNING, "This should not have happened!!");
+    private Controller getControllerByTopic( String topic) {
+        for ( RemoteControllerTwin aDeviceTwin : this.getRemoteControllerTwinList()) {
+            // get the underlying controller object
+            Controller controller = aDeviceTwin.getController();
+            if (controller.getStateTopic().contentEquals(topic)) {
+                return controller;
             }
         }
+        return null;
+    }
+
+    private Controller getControllerById( String controllerId) {
+        for (RemoteControllerTwin aTwin : this.getRemoteControllerTwinList()) {
+            Controller controller = aTwin.getController();
+            if (controller.getId().contentEquals(controllerId)) {
+                return controller;
+            }
+        }
+        return null;
     }
 
     private DateTime getUaDateTime() {
@@ -273,10 +284,10 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
     }
 
     /**
-     * @return the variableProperties
+     * @return the remoteControllerProperties
      */
-    public Map<String, Parameter> getVariableProperties() {
-        return variableProperties;
+    public Map<String, Parameter> getRemoteControllerProperties() {
+        return remoteControllerProperties;
     }
 
     @Override
@@ -297,7 +308,7 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
         // get identifier of this node
         String nodeIdentifier = aNode.getNodeId().getIdentifier().toString();
         // find in map with topic parameter entries the one that matches with the node identifier
-        for (Entry entry : this.variableProperties.entrySet()) {
+        for (Entry entry : this.remoteControllerProperties.entrySet()) {
             String topic = (String) entry.getKey();
             if (topic.endsWith( nodeIdentifier)) {
                 Parameter parameter = (Parameter) entry.getValue();
@@ -305,5 +316,12 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
             }
         }
         return null;
+    }
+
+    /**
+     * @return the remoteControllerTwinList
+     */
+    public List<RemoteControllerTwin> getRemoteControllerTwinList() {
+        return remoteControllerTwinList;
     }
 }

@@ -1,4 +1,4 @@
-package name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects;
+package name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "controller"
 })
 @Generated("jsonschema2pojo")
-public class DeviceControllerTwin {
+public class RemoteControllerTwin {
 
     @JsonProperty("controller")
     private Controller controller;

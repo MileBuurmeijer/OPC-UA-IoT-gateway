@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import name.buurmeijermile.smilesware.services.opcua.datasource.IoTDeviceBackendController;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Controller;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Device;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.DeviceControllerTwin;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Parameter;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Controller;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.RemoteControllerTwin;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Parameter;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Sensuator;
 import name.buurmeijermile.smilesware.services.opcua.main.Configuration;
 
 import org.eclipse.milo.opcua.sdk.core.AccessLevel;
@@ -49,7 +49,6 @@ import org.eclipse.milo.opcua.sdk.server.dtd.DataTypeDictionaryManager;
 import org.eclipse.milo.opcua.sdk.server.api.ManagedNamespaceWithLifecycle;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaMethodNode;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
-import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 
 public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
@@ -59,7 +58,7 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
     // instance variables
     private final SubscriptionModel subscriptionModel;
     private final OpcUaServer server;
-    //private final DeviceControllerTwin deviceControllerTwin;
+    //private final RemoteControllerTwin deviceControllerTwin;
     private final IoTDeviceBackendController dataBackendController;
     private final RestrictedAccessFilter restrictedAccessFilter;
     private List<UaVariableNode> variableNodes = null;
@@ -126,12 +125,12 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
     }
 
     protected void onStartup() {
-        for (DeviceControllerTwin aTwin : this.dataBackendController.getControllerTwins()) {
+        for (RemoteControllerTwin aTwin : this.dataBackendController.getRemoteControllerTwinList()) {
             this.addDevicesToNameSpace(aTwin);
         }
     }
     
-    private void addDevicesToNameSpace( DeviceControllerTwin aTwin) {
+    private void addDevicesToNameSpace( RemoteControllerTwin aTwin) {
         Controller controller = aTwin.getController();
         String controllerNodeIDString = controller.getName() + "/" + controller.getId() ;
         UaFolderNode controllerFolder = new UaFolderNode(
@@ -151,9 +150,12 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
         ));
         // add remote command method to this folder
         this.addRemoteControlMethodNode( controller, controllerFolder);
+        // add controller status node to this folder
+        this.addStatusNode( controller, controllerFolder);
         // add all devices from this controller
-        for (Device device : controller.getDevices()) {
-            String deviceNodeIDString = device.getName() + "/" + device.getId();
+        for (Sensuator sensuator : controller.getSensuators()) {
+            // create device folder per found device
+            String deviceNodeIDString = sensuator.getName() + "/" + sensuator.getId();
             UaFolderNode deviceFolder = new UaFolderNode(
                     this.getNodeContext(),
                     newNodeId( deviceNodeIDString),
@@ -164,8 +166,8 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
             this.getNodeManager().addNode(deviceFolder);
             // and into the folder structure under the controller folder
             controllerFolder.addOrganizes(deviceFolder);
-            // create type property under device
-            String typeNodeIDString = controller.getName() + "/" + controller.getId() + "/" + device.getName()+"/" + device.getId() + "/type";
+            // create 'type' property under device
+            String typeNodeIDString = controller.getName() + "/" + controller.getId() + "/" + sensuator.getName()+"/" + sensuator.getId() + "/type";
             UaVariableNode typeNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
                 .setNodeId(newNodeId(typeNodeIDString))
                 .setAccessLevel(AccessLevel.READ_ONLY)
@@ -176,14 +178,14 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
                 .setTypeDefinition(Identifiers.BaseDataType)
                 .build();
             // set type id as static value 
-            typeNode.setValue(new DataValue( new Variant(device.getType())));
+            typeNode.setValue(new DataValue( new Variant(sensuator.getType())));
             // add to namespace
             getNodeManager().addNode(typeNode);
             deviceFolder.addOrganizes(typeNode);
             // add dynamic properties to the device
-            for (Parameter parameter : device.getParameters()) {
+            for (Parameter parameter : sensuator.getParameters()) {
                 // first create setpoint parameter node for setting the value of the remote object's parameter
-                String setNodeIdString = controller.getName() + "/"+ controller.getId() + "/" + device.getName()+"/" + device.getId() + "/set/" + parameter.getName();
+                String setNodeIdString = controller.getName() + "/"+ controller.getId() + "/" + sensuator.getName()+"/" + sensuator.getId() + "/set/" + parameter.getName();
                 String setNodeName = "set-" + parameter.getName();
                 UaVariableNode propertySetNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
                     .setNodeId(newNodeId(setNodeIdString))
@@ -194,7 +196,7 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
                     .setTypeDefinition(Identifiers.BaseDataVariableType)
                     .build();
                 // then variable node that exposes actual value of the parameter from the remote device
-                String getNodeIdString = controller.getName() + "/" + controller.getId() + "/" + device.getName()+"/" + device.getId() + "/get/" + parameter.getName();
+                String getNodeIdString = controller.getName() + "/" + controller.getId() + "/" + sensuator.getName()+"/" + sensuator.getId() + "/get/" + parameter.getName();
                 String getNodeName = "get-" + parameter.getName();
                 UaVariableNode propertyGetNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
                     .setNodeId(newNodeId(getNodeIdString))
@@ -242,28 +244,43 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
             }
         }
     }
+
+    private void addStatusNode(Controller controller, UaFolderNode controllerFolder) {
+        String parentFolderName = controllerFolder.getBrowseName().getName();
+        try {
+            // first create setpoint parameter node for setting the value of the remote object's parameter
+            String strippedStateTopic = controller.getStateTopic();
+            strippedStateTopic = strippedStateTopic.substring( strippedStateTopic.indexOf('/'));
+            String setNodeIdString = strippedStateTopic;
+            String setNodeName = "state";
+            UaVariableNode controllerStatusNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
+                .setNodeId(newNodeId(setNodeIdString))
+                .setAccessLevel(AccessLevel.READ_ONLY)
+                .setUserAccessLevel(AccessLevel.READ_ONLY)
+                .setBrowseName(newQualifiedName(setNodeName))
+                .setDisplayName(LocalizedText.english(setNodeName))
+                .setTypeDefinition(Identifiers.BaseDataVariableType)
+                .build();
+            controllerStatusNode.setDataType(Identifiers.String);
+            // create a proper initial value
+            DataValue initialDataValue = new DataValue( new Variant("null"));
+            // set the initial value
+            controllerStatusNode.setValue(initialDataValue);
+            // add listener to value changes of this node when an OPC UA client write to this set-node
+            controllerStatusNode.addAttributeObserver( dataBackendController);
+            // add node to Parameter remote object so that is value can be set of this get-node
+            controller.setUaVariableNode( controllerStatusNode);
+            // add to namespace with respective references
+            getNodeManager().addNode(controllerStatusNode);
+            controllerFolder.addOrganizes(controllerStatusNode);
+        } catch (NumberFormatException ex) {
+            LOGGER.log(Level.SEVERE, "number format wrong: " + ex.getMessage(), ex);
+        }
+    }
     
-    // todo: update this merge from another project (OPC UA Player)
     private void addRemoteControlMethodNode( Controller controller, UaFolderNode controllerFolder) {
         String parentFolderName = controllerFolder.getBrowseName().getName();
         try {
-//            // create a "PlayerControl" folder and add it to the node manager
-//            NodeId remoteControlNodeId = this.newNodeId(parentFolderName);
-//            UaFolderNode remoteControlFolderNode = new UaFolderNode(
-//                    this.getNodeContext(),
-//                    remoteControlNodeId,
-//                    this.newQualifiedName(parentFolderName),
-//                    LocalizedText.english(parentFolderName)
-//            );
-//            // add this method node to servers node map
-//            this.getNodeManager().addNode(remoteControlFolderNode);
-//            // and into the folder structure under root/objects by adding a reference to it
-//            remoteControlFolderNode.addReference(new Reference(
-//                    remoteControlFolderNode.getNodeId(),
-//                    Identifiers.Organizes,
-//                    Identifiers.ObjectsFolder.expanded(),
-//                    false
-//            ));
             // bulld the method node
             UaMethodNode methodNode = UaMethodNode.builder(this.getNodeContext())
                     .setNodeId(newNodeId(parentFolderName + "/remote-control(x)"))
@@ -287,24 +304,6 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
                     controllerFolder.getNodeId().expanded(), // target nodeid
                     false
             ));
-//            // add in same folder a variable node that shows the current state
-//            String nodeName = "RemoteCommand";
-//            // create variable node
-//            UaVariableNode runStateVariableNode = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
-//                .setNodeId(newNodeId(parentFolderName + "/" + nodeName))
-//                .setAccessLevel(AccessLevel.READ_ONLY)
-//                .setUserAccessLevel(AccessLevel.READ_ONLY)
-//                .setBrowseName(newQualifiedName(nodeName))
-//                .setDisplayName(LocalizedText.english(nodeName))
-//                .setDataType(Identifiers.String)
-//                .setTypeDefinition(Identifiers.BaseDataVariableType)
-//                .build();
-//            // make this varable node known to data backend controller so that it can updates to the runstate into this node
-//            //this.dataController.setRunStateUANode(runStateVariableNode);
-//            // add node to server mapRunState"
-//            this.getNodeManager().addNode(runStateVariableNode);
-//            // add node to this player folder
-//            controllerFolder.addOrganizes(runStateVariableNode);
         } catch (NumberFormatException ex) {
             Logger.getLogger(IoTDeviceGatewayNamespace.class.getName()).log(Level.SEVERE, "number format wrong: " + ex.getMessage(), ex);
         }

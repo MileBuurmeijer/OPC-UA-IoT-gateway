@@ -5,17 +5,17 @@
  */
 package name.buurmeijermile.smilesware.services.opcua.datasource;
 
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Controller;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Controller;
 
 /**
  *
  * @author Milé Buurmeijer <mbuurmei at netscape.net>
  */
-public class RemoteControleCommand {
+public class RemoteControllerCommand {
     private final Controller controller;
     private final String command;
     
-    public RemoteControleCommand( Controller aController, String aCommand) {
+    public RemoteControllerCommand( Controller aController, String aCommand) {
         this.controller = aController;
         this.command = aCommand;
     }

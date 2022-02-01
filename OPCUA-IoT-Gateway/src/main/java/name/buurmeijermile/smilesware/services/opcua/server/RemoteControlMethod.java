@@ -25,7 +25,6 @@ package name.buurmeijermile.smilesware.services.opcua.server;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import name.buurmeijermile.smilesware.services.opcua.datasource.RemoteControleCommand;
 import org.eclipse.milo.opcua.sdk.core.ValueRanks;
 import org.eclipse.milo.opcua.sdk.server.api.methods.AbstractMethodInvocationHandler;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaMethodNode;
@@ -35,7 +34,8 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 import org.eclipse.milo.opcua.stack.core.types.structured.Argument;
 import name.buurmeijermile.smilesware.services.opcua.datasource.IoTDeviceBackendController;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects.Controller;
+import name.buurmeijermile.smilesware.services.opcua.datasource.RemoteControllerCommand;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Controller;
 
 public class RemoteControlMethod extends AbstractMethodInvocationHandler {
 
@@ -81,7 +81,7 @@ public class RemoteControlMethod extends AbstractMethodInvocationHandler {
 
         String command = inputValues[0].getValue().toString();
         
-        RemoteControleCommand controllerCommand = new RemoteControleCommand( this.controller, command);
+        RemoteControllerCommand controllerCommand = new RemoteControllerCommand( this.controller, command);
 
         Logger.getLogger(RemoteControlMethod.class.getName()).log(Level.FINE, "control(" + command + ")");
         Logger.getLogger(RemoteControlMethod.class.getName()).log(Level.FINE, "Invoking control() method of Object '" + invocationContext.getMethodNode().getBrowseName().getName() + "'");

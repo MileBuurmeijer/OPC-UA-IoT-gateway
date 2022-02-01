@@ -3,7 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package name.buurmeijermile.smilesware.services.opcua.iotgateway.remoteobjects;
+package old;
+
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Parameter;
 
 /**
  *

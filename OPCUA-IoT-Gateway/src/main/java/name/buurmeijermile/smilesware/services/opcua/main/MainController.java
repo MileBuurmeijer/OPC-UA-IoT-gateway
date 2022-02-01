@@ -59,7 +59,7 @@ public class MainController {
                         new IoTDeviceGatewayNamespace( 
                                 opcuaServer.getServer(), 
                                 ioTDeviceBackendController, 
-                                Configuration.getConfiguration());
+                                configuration);
                 deviceNamespace.startup();
                 LOGGER.log(Level.INFO, "Device namespace added");
             } else {
