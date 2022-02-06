@@ -8,9 +8,13 @@ package name.buurmeijermile.smilesware.services.opcua.iotgateway;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.RemoteControllerTwin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +32,7 @@ public class MqttController implements MqttMessageListener, Runnable{
     private final String commandTopic = "IntelligentIndustryExperience/controller/set/command";
     private final String informationModelTopic = "IntelligentIndustryExperience/controller/get/informationModel";
     public final RemoteControllerCommandMessage getInformationModelCommand = new RemoteControllerCommandMessage(commandTopic, "{ \"get\": \"model\" } "); // any JSON Object would do for now
-    private final List<MqttTopicMessage> messageQueue = new ArrayList<>();
+    private final Queue<MqttTopicMessage> messageQueue = new LinkedList<>();
 //    private RemoteControllerTwin controllerTwin = null;
     private final ObjectMapper mapper = new ObjectMapper();
     private boolean running = false;
@@ -102,21 +106,14 @@ public class MqttController implements MqttMessageListener, Runnable{
     
     @Override
     public void run() {
-        boolean runOnce = true;
-        Iterator<MqttTopicMessage> messageIterator;
-        while (running) {
-            if (runOnce) {
-                runOnce = false;
-                // request information model
-                this.sendRequest( getInformationModelCommand);
-                LOGGER.log(Level.INFO, "Information model requested");
-            } else {
-                messageIterator = this.messageQueue.iterator();
-                while (messageIterator.hasNext()) {
-                    MqttTopicMessage message = messageIterator.next();
-                    this.processMessage(message);
-                    messageIterator.remove();
-                }
+        // first request information model from controllers that are listening to this topic
+        this.sendRequest( getInformationModelCommand);
+        LOGGER.log(Level.INFO, "Information model requested");
+        // then process the message queue for ever
+        while (true) {
+            MqttTopicMessage message = this.messageQueue.poll();
+            if (message != null) {
+                processMessage(message);
             }
             Waiter.waitMilliSeconds(10); // wait 10 milliseconds
         }
@@ -131,9 +128,14 @@ public class MqttController implements MqttMessageListener, Runnable{
     @Override
     public void receiveMqttMessage(MqttTopicMessage message) {
         // just add it to the message queue so that mqttclient can continue and
-        // this thread can process the messages in its own pace
+        // this MqttController thread can process the messages in its own pace
         LOGGER.log(Level.INFO, "Message received adding it to the queue");
-        this.messageQueue.add(message);
+        LocalDateTime currentTime = LocalDateTime.now();
+        Duration deltaTime = Duration.ZERO;
+        // check if message fits in the queue (and work with timout)
+        while (!this.messageQueue.offer(message) && deltaTime.compareTo(Duration.ofMillis(1000)) > 0 ) {
+            deltaTime = Duration.between(currentTime, LocalDateTime.now());
+        }
     }
     
     /**
@@ -153,10 +155,6 @@ public class MqttController implements MqttMessageListener, Runnable{
     public void stop() {
         this.running = false;
     }
-//
-//    public RemoteControllerTwin getDeviceControllerTwin() {
-//        return controllerTwin;
-//    }
 
     public void publishMessage(String setTopic, Object value) {
         this.mqttClient.publishMessage( setTopic, value.toString());

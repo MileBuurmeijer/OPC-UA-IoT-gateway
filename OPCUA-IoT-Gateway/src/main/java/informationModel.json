@@ -4,21 +4,21 @@
         "state-topic": "IntelligentIndustryExperience/controller/0/get/status",
         "name": "controller",
         "id": "0",
-        "devices": [
+        "sensuators": [
             {
                 "name": "servo-motor",
                 "id": "0",
                 "type": 1,
                 "parameters": [
                     {
-                        "name": "speed",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/get/speed",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/set/speed"
+                        "name": "degrees-setpoint",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/get/degrees-setpoint",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/set/degrees-setpoint"
                     },
                     {
-                        "name": "degrees",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/get/degrees",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/set/degrees"
+                        "name": "degrees-measured",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/get/degrees-measured",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/0/set/degrees-measured"
                     }
                 ]
             },
@@ -28,14 +28,14 @@
                 "type": 1,
                 "parameters": [
                     {
-                        "name": "speed",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/get/speed",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/set/speed"
+                        "name": "degrees-setpoint",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/get/degrees-setpoint",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/set/degrees-setpoint"
                     },
                     {
-                        "name": "degrees",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/get/degrees",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/set/degrees"
+                        "name": "degrees-measured",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/get/degrees-measured",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/1/set/degrees-measured"
                     }
                 ]
             },
@@ -45,14 +45,14 @@
                 "type": 1,
                 "parameters": [
                     {
-                        "name": "speed",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/get/speed",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/set/speed"
+                        "name": "degrees-setpoint",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/get/degrees-setpoint",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/set/degrees-setpoint"
                     },
                     {
-                        "name": "degrees",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/get/degrees",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/set/degrees"
+                        "name": "degrees-measured",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/get/degrees-measured",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/2/set/degrees-measured"
                     }
                 ]
             },
@@ -62,14 +62,14 @@
                 "type": 1,
                 "parameters": [
                     {
-                        "name": "speed",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/get/speed",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/set/speed"
+                        "name": "degrees-setpoint",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/get/degrees-setpoint",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/set/degrees-setpoint"
                     },
                     {
-                        "name": "degrees",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/get/degrees",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/set/degrees"
+                        "name": "degrees-measured",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/get/degrees-measured",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/3/set/degrees-measured"
                     }
                 ]
             },
@@ -79,14 +79,14 @@
                 "type": 1,
                 "parameters": [
                     {
-                        "name": "speed",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/get/speed",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/set/speed"
+                        "name": "degrees-setpoint",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/get/degrees-setpoint",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/set/degrees-setpoint"
                     },
                     {
-                        "name": "degrees",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/get/degrees",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/set/degrees"
+                        "name": "degrees-measured",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/get/degrees-measured",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/4/set/degrees-measured"
                     }
                 ]
             },
@@ -96,14 +96,14 @@
                 "type": 1,
                 "parameters": [
                     {
-                        "name": "speed",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/get/speed",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/set/speed"
+                        "name": "degrees-setpoint",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/get/degrees-setpoint",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/set/degrees-setpoint"
                     },
                     {
-                        "name": "degrees",
-                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/get/degrees",
-                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/set/degrees"
+                        "name": "degrees-measured",
+                        "gettopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/get/degrees-measured",
+                        "settopic": "IntelligentIndustryExperience/controller/0/servo-motor/5/set/degrees-measured"
                     }
                 ]
             }
