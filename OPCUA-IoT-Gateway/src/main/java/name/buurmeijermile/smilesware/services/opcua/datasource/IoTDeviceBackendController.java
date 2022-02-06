@@ -28,7 +28,6 @@ import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informati
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Sensuator;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Parameter;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.ActionCommand;
-import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.Task;
 import name.buurmeijermile.smilesware.services.opcua.utils.Waiter;
 import org.eclipse.milo.opcua.sdk.server.nodes.AttributeObserver;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaNode;
@@ -50,7 +49,6 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
     private final MqttController mqttController;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private RemoteControllerTwin controllerTwin;
     private List<RemoteControllerTwin> remoteControllerTwinList = new ArrayList<>();
     private final Map<String, Parameter> remoteControllerProperties = new HashMap<>();
     private final ZoneOffset zoneOffset;
@@ -255,7 +253,7 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
         return null;
     }
 
-    private Controller getControllerById( String controllerId) {
+    public Controller getControllerById( String controllerId) {
         for (RemoteControllerTwin aTwin : this.getRemoteControllerTwinList()) {
             Controller controller = aTwin.getController();
             if (controller.getId().contentEquals(controllerId)) {
@@ -281,13 +279,6 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
         // create java date out of that
         DateTime dateTime = new DateTime(javaDate);
         return dateTime;
-    }
-
-    /**
-     * @return the remoteControllerProperties
-     */
-    public Map<String, Parameter> getRemoteControllerProperties() {
-        return remoteControllerProperties;
     }
 
     @Override
@@ -323,5 +314,9 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
      */
     public List<RemoteControllerTwin> getRemoteControllerTwinList() {
         return remoteControllerTwinList;
+    }
+    
+    public void subscribeToTaskEvents( TaskEventListener  aTaskEventListener) {
+        this.taskController.addTaskEventListener(aTaskEventListener);
     }
 }

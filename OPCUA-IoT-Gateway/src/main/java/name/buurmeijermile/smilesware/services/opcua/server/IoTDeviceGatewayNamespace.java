@@ -23,17 +23,19 @@
  */
 package name.buurmeijermile.smilesware.services.opcua.server;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import name.buurmeijermile.smilesware.services.opcua.datasource.IoTDeviceBackendController;
+import name.buurmeijermile.smilesware.services.opcua.datasource.TaskEvent;
+import name.buurmeijermile.smilesware.services.opcua.datasource.TaskEventListener;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Controller;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.RemoteControllerTwin;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Parameter;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Sensuator;
 import name.buurmeijermile.smilesware.services.opcua.main.Configuration;
-
 import org.eclipse.milo.opcua.sdk.core.AccessLevel;
 import org.eclipse.milo.opcua.sdk.core.Reference;
 import org.eclipse.milo.opcua.sdk.server.OpcUaServer;
@@ -47,11 +49,20 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.sdk.server.Lifecycle;
 import org.eclipse.milo.opcua.sdk.server.dtd.DataTypeDictionaryManager;
 import org.eclipse.milo.opcua.sdk.server.api.ManagedNamespaceWithLifecycle;
+import org.eclipse.milo.opcua.sdk.server.model.nodes.objects.BaseEventTypeNode;
+import org.eclipse.milo.opcua.sdk.server.model.nodes.objects.ServerTypeNode;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaMethodNode;
+import org.eclipse.milo.opcua.sdk.server.nodes.UaNode;
+import org.eclipse.milo.opcua.stack.core.UaException;
+import org.eclipse.milo.opcua.stack.core.types.builtin.ByteString;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
+import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
+import org.eclipse.milo.opcua.stack.core.types.builtin.DateTime;
+import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.ubyte;
+import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.ushort;
 
-public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
+public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle implements TaskEventListener {
     // class variables
     private static final Logger LOGGER = Logger.getLogger(IoTDeviceGatewayNamespace.class.getName());
 
@@ -61,10 +72,11 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
     //private final RemoteControllerTwin deviceControllerTwin;
     private final IoTDeviceBackendController dataBackendController;
     private final RestrictedAccessFilter restrictedAccessFilter;
-    private List<UaVariableNode> variableNodes = null;
+//    private List<UaVariableNode> variableNodes = null;
     private volatile Thread eventThread;
     private volatile boolean keepPostingEvents = true;
     private DataTypeDictionaryManager dictionaryManager;
+    private List<UaFolderNode> controllerFolderNodes = new ArrayList<>();
 
     /**
      * The intended namespace for the OPC UA server.
@@ -79,7 +91,6 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
         // store parameters
         this.server = server;
         this.dataBackendController = anIoTBackendController;
-//        this.deviceControllerTwin = anIoTBackendController.getControllerTwin();
         
         // create a subscription model for this server
         this.subscriptionModel = new SubscriptionModel(server, this);
@@ -117,13 +128,22 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
             }
         });
 
-        this.variableNodes = new ArrayList<>();       
+//        this.variableNodes = new ArrayList<>();       
+        this.dataBackendController.subscribeToTaskEvents(this);
     }
     
     protected void startBogusEventNotifier() {
-        // do nothing
-    }
+        // Set the EventNotifier bit on Server Node for Events.
+        UaNode serverNode = getServer()
+            .getAddressSpaceManager()
+            .getManagedNode(Identifiers.Server)
+            .orElse(null);
 
+        if (serverNode instanceof ServerTypeNode) {
+            ((ServerTypeNode) serverNode).setEventNotifier(ubyte(1));
+        }
+    }
+    
     protected void onStartup() {
         for (RemoteControllerTwin aTwin : this.dataBackendController.getRemoteControllerTwinList()) {
             this.addDevicesToNameSpace(aTwin);
@@ -139,6 +159,10 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
                 newQualifiedName( controllerNodeIDString),
                 LocalizedText.english( controllerNodeIDString)
         );
+        // set event notifier bit in this node for events
+        controllerFolder.setEventNotifier(ubyte(1));
+        // add this to list of controller folder nodes
+        this.controllerFolderNodes.add( controllerFolder);
         // add controller folder to nodes
         this.getNodeManager().addNode(controllerFolder);
         // and into the folder structure under root/objects by adding a reference to it
@@ -327,5 +351,48 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle {
     @Override
     public void onMonitoringModeChanged(List<MonitoredItem> monitoredItems) {
         this.subscriptionModel.onMonitoringModeChanged(monitoredItems);
+    }
+
+    @Override
+    public void receiveTaskEvent(TaskEvent aTaskEvent) {
+        System.out.println("Receive task event: " + aTaskEvent.getName());
+        String originatingControllerName = aTaskEvent.getController().getName() +"/"+  aTaskEvent.getController().getId();
+        System.out.println("OriginatingControllerName: " + originatingControllerName);
+        for (UaFolderNode folderNode: this.controllerFolderNodes) {
+            // check if this folder has samen name as the originating controller name
+            if (folderNode.getNodeId().getIdentifier().toString().contentEquals(originatingControllerName)) {
+                // create OPC UA Event and publish
+                System.out.println("About to publish an task event");
+                publishEvent( folderNode, aTaskEvent.getName(), originatingControllerName);
+            }
+        }
+    }
+    
+    private void publishEvent( UaFolderNode folderNode, String taskName, String controllerName)  {
+        String eventName = controllerName+"/"+taskName;
+        try {
+            BaseEventTypeNode eventNode = getServer().getEventFactory().createEvent(
+                    newNodeId(UUID.randomUUID()),
+                    Identifiers.BaseEventType
+            );
+            
+            eventNode.setBrowseName(new QualifiedName(1, eventName));
+            eventNode.setDisplayName(LocalizedText.english( eventName));
+            eventNode.setEventId(ByteString.of(new byte[]{0, 1, 2, 3}));
+            eventNode.setEventType(Identifiers.BaseEventType);
+            eventNode.setSourceNode(folderNode.getNodeId());
+            eventNode.setSourceName(folderNode.getDisplayName().getText());
+            eventNode.setTime(DateTime.now());
+            eventNode.setReceiveTime(DateTime.NULL_VALUE);
+            eventNode.setMessage(LocalizedText.english("task-ready event message!"));
+            eventNode.setSeverity(ushort(2));
+            System.out.println("Just before posting the event node");
+            //noinspection UnstableApiUsage
+            getServer().getEventBus().post(eventNode);
+            
+            eventNode.delete();
+        } catch (UaException ex) {
+            Logger.getLogger(IoTDeviceGatewayNamespace.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

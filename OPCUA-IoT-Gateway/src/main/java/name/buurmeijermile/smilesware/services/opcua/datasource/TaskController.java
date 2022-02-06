@@ -21,6 +21,7 @@ import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controlle
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.Capability;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.ControllerCapabilities;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.Task;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Controller;
 import name.buurmeijermile.smilesware.services.opcua.utils.Waiter;
 
 /**
@@ -44,6 +45,7 @@ public class TaskController implements Runnable{
     private final CapabilitiesStore capabilityStore = new CapabilitiesStore();
     private ControllerCapabilities controllerCapabilities;
     private final List<String> requestedTasksList = new ArrayList<>();
+    private final List<TaskEventListener> taskEventListeners = new ArrayList<>();
     private boolean running = false;
     
     public TaskController( IoTDeviceBackendController anIoTDeviceBackendController) {
@@ -53,6 +55,10 @@ public class TaskController implements Runnable{
     
     public void initialize() {
         this.controllerCapabilities = this.capabilityStore.readCapabilities( new File("/home/mbuurmei/NetBeansProjects/OPC-UA-IoT-gateway/OPCUA-IoT-Gateway/src/main/java/capabilities-example.json"));
+    }
+    
+    public void addTaskEventListener( TaskEventListener aTaskEventListener) {
+        this.taskEventListeners.add(aTaskEventListener);
     }
     
     public int requestTask( String taskName) {
@@ -153,11 +159,24 @@ public class TaskController implements Runnable{
         // iterate through the underlying action commands
         for (ActionCommand anActionCommand : aTask.getActionCommands()) {
             // first check if there is a pause action set to execute
-                Waiter.waitADuration( Duration.ofSeconds(10)); // add 10 seconds between commands, TODO: make this smarter
-                this.executeActionCommand( anActionCommand);
+            Waiter.waitADuration( Duration.ofSeconds(10)); // add 10 seconds between commands, TODO: make this smarter
+            this.executeActionCommand( anActionCommand);
         }
-        //
-        
+        // flag to task event listener that task is ready
+        // first get the controller of the task that was just executed
+        ActionCommand anActionCommand = aTask.getActionCommands().get(0);
+        if (anActionCommand != null) {
+            // get controller id
+            String controllerId = anActionCommand.getControllerState().getControllerId();
+            // find controller with this id from information models from remote controllers
+            Controller controller = this.ioTDeviceBackendController.getControllerById( controllerId);
+            // create task event with the controller
+            TaskEvent taskReadyEvent = new TaskEvent( "task-ready", controller);
+            // send to listeners
+            this.taskEventListeners.forEach(action -> action.receiveTaskEvent(taskReadyEvent)); 
+        } else {
+            LOGGER.log( Level.WARNING, "First action command not found in executed task?!");
+        }
     }
 
     @Override
