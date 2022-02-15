@@ -6,30 +6,32 @@
     <version>0.6-snapshot</version>
     <build>
         <resources>
-          <resource>
-            <directory>src/main/java</directory>
-            <includes>
-              <include>action-command.json</include>
-              <include>capabilities-example.json</include>
-              <include>informationModel.json</include>
-            </includes>
-          </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>action-command.json</include>
+                    <include>capabilities-example.json</include>
+                    <include>informationModel.json</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-dependency-plugin</artifactId>
-              <version>3.2.0</version>
-              <executions>
-                <execution>
-                  <id>copy-dependencies</id>
-                  <phase>package</phase>
-                  <goals>
-                    <goal>copy-dependencies</goal>
-                  </goals>
-                </execution>
-              </executions>
-            </plugin>
+            <!--
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.2.0</version>
+          <executions>
+            <execution>
+              <id>copy-dependencies</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -38,8 +40,8 @@
                     <archive>
                         <manifest>
                             <mainClass>name.buurmeijermile.smilesware.services.opcua.main.MainController</mainClass>
-                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                       </manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
                     </archive>
                 </configuration>
             </plugin>
@@ -104,6 +106,7 @@
                     </execution>
                 </executions>
             </plugin>
+           
         </plugins>
     </build>
     <packaging>jar</packaging>
@@ -113,6 +116,11 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.0.1-jre</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-resources-plugin</artifactId>
@@ -144,12 +152,14 @@
             <artifactId>bcpkix-jdk15on</artifactId>
             <version>[1.66,)</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.paho</groupId>
-            <artifactId>java-parent</artifactId>
-            <version>1.2.5</version>
-            <type>pom</type>
-        </dependency>
+        <!--
+<dependency>
+    <groupId>org.eclipse.paho</groupId>
+    <artifactId>java-parent</artifactId>
+    <version>1.2.5</version>
+    <type>pom</type>
+</dependency>
+        -->
         <dependency>
             <groupId>org.eclipse.paho</groupId>
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
