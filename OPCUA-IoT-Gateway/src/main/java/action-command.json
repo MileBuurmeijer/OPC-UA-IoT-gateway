@@ -5,72 +5,18 @@
         "controller-name": "controller",
         "controller-id": "0",
         "state-name": "ungrp",
-        "sensuators": [{
+        "sensuators": [
+            {
                 "name": "servo-motor",
                 "id": "0",
                 "type": 1,
-                "parameters": [{
-                        "name": "speed",
-                        "value": "1.00"
-                    }, {
-                        "name": "degrees",
+                "parameters": [
+                    {
+                        "name": "degrees-setpoint",
                         "value": "15.00"
-                    }]
-            }, {
-                "name": "servo-motor",
-                "id": "1",
-                "type": 1,
-                "parameters": [{
-                        "name": "speed",
-                        "value": "1.00"
-                    }, {
-                        "name": "degrees",
-                        "value": "149.00"
-                    }]
-            }, {
-                "name": "servo-motor",
-                "id": "2",
-                "type": 1,
-                "parameters": [{
-                        "name": "speed",
-                        "value": "1.00"
-                    }, {
-                        "name": "degrees",
-                        "value": "44.00"
-                    }]
-            }, {
-                "name": "servo-motor",
-                "id": "3",
-                "type": 1,
-                "parameters": [{
-                        "name": "speed",
-                        "value": "1.00"
-                    }, {
-                        "name": "degrees",
-                        "value": "180.00"
-                    }]
-            }, {
-                "name": "servo-motor",
-                "id": "4",
-                "type": 1,
-                "parameters": [{
-                        "name": "speed",
-                        "value": "1.00"
-                    }, {
-                        "name": "degrees",
-                        "value": "76.00"
-                    }]
-            }, {
-                "name": "servo-motor",
-                "id": "5",
-                "type": 1,
-                "parameters": [{
-                        "name": "speed",
-                        "value": "1.00"
-                    }, {
-                        "name": "degrees",
-                        "value": "180.00"
-                    }]
-            }]
+                    }
+                ]
+            }
+        ]
     }
 }

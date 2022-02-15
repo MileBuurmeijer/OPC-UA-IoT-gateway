@@ -3,7 +3,109 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>name.buurmeijermile.smilesware.services</groupId>
     <artifactId>OPCUA-IoT-Gateway</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.6-snapshot</version>
+    <build>
+        <resources>
+          <resource>
+            <directory>src/main/java</directory>
+            <includes>
+              <include>action-command.json</include>
+              <include>capabilities-example.json</include>
+              <include>informationModel.json</include>
+            </includes>
+          </resource>
+        </resources>
+        <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <version>3.2.0</version>
+              <executions>
+                <execution>
+                  <id>copy-dependencies</id>
+                  <phase>package</phase>
+                  <goals>
+                    <goal>copy-dependencies</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>name.buurmeijermile.smilesware.services.opcua.main.MainController</mainClass>
+                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                       </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        name.buurmeijermile.smilesware.services.opcua.main.MainController
+                                    </mainClass>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>2.7.0</version>
+                <configuration>
+                    <creationTime>${maven.build.timestamp}</creationTime>
+                    <to>
+                        <image>smilesmakershedsystem.local/opcuaiotgateway</image>
+                        <auth>
+                            <username>mbuurmei</username>
+                            <password>Monyou@87</password>
+                        </auth>
+                    </to>
+                    <containerizingMode>packaged</containerizingMode>                
+                    <container>
+                        <entrypoint>java,-jar,${project.build.finalName}.jar</entrypoint>
+                    </container>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -11,6 +113,12 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.2.0</version>
+            <type>maven-plugin</type>
+        </dependency>        
         <dependency>
             <groupId>org.eclipse.milo</groupId>
             <artifactId>dictionary-manager</artifactId>

@@ -40,6 +40,7 @@ import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informati
 public class RemoteControlMethod extends AbstractMethodInvocationHandler {
 
     private final Controller controller;
+    private final IoTDeviceGatewayNamespace namespaceManager;
     private final IoTDeviceBackendController iotDeviceBackendController;
     
     // create the input argument
@@ -59,9 +60,10 @@ public class RemoteControlMethod extends AbstractMethodInvocationHandler {
         new LocalizedText("The result of the control command")
     );
     
-    public RemoteControlMethod( UaMethodNode aMethodNode, IoTDeviceBackendController aIoTDeviceBackendController, Controller aController) {
+    public RemoteControlMethod( UaMethodNode aMethodNode, IoTDeviceGatewayNamespace parentNamespaceManager, IoTDeviceBackendController aIoTDeviceBackendController, Controller aController) {
         super( aMethodNode);
         this.controller = aController; // the digital twin of the controller inside the IoT device
+        this.namespaceManager = parentNamespaceManager;
         this.iotDeviceBackendController = aIoTDeviceBackendController; // the back end controller of this OPC UA server controller the remote IoT device
     }
 
@@ -77,16 +79,24 @@ public class RemoteControlMethod extends AbstractMethodInvocationHandler {
 
     @Override
     protected Variant[] invoke(InvocationContext invocationContext, Variant[] inputValues) throws UaException {
-        Logger.getLogger( RemoteControlMethod.class.getName()).log(Level.FINE, "Invoking command() method of objectId={}", invocationContext.getObjectId());
+        Logger.getLogger( RemoteControlMethod.class.getName()).log(Level.FINE, "Invoking remote control method of objectId={}", invocationContext.getObjectId());
 
         String command = inputValues[0].getValue().toString();
+        String commandResult = "";
         
-        RemoteControllerCommand controllerCommand = new RemoteControllerCommand( this.controller, command);
+        if (command.equals("#TE")) {
+            String controllerName = this.controller.getName() + "/" + this.controller.getId();
+            namespaceManager.publishEvent(invocationContext.getMethodNode(), "test-task-1", controllerName);
+            commandResult = "Test event requested";
+        } else {
+            RemoteControllerCommand controllerCommand = new RemoteControllerCommand( this.controller, command);
 
-        Logger.getLogger(RemoteControlMethod.class.getName()).log(Level.FINE, "control(" + command + ")");
-        Logger.getLogger(RemoteControlMethod.class.getName()).log(Level.FINE, "Invoking control() method of Object '" + invocationContext.getMethodNode().getBrowseName().getName() + "'");
+            Logger.getLogger(RemoteControlMethod.class.getName()).log(Level.FINE, "control(" + command + ")");
+            Logger.getLogger(RemoteControlMethod.class.getName()).log(Level.FINE, "Invoking control() method of Object '" + invocationContext.getMethodNode().getBrowseName().getName() + "'");
 
-        String commandResult = this.iotDeviceBackendController.receiveRemoteControlCommand( controllerCommand);
+            commandResult = this.iotDeviceBackendController.receiveRemoteControlCommand( controllerCommand);
+        }
+        
 
         return new Variant[]{new Variant(commandResult)};   
     }

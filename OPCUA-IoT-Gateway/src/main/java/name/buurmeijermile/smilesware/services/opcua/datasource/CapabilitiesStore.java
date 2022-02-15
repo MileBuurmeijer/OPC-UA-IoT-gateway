@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.ControllerCapabilities;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.RemoteControllerTwin;
 
 /**
- * Task store handles the storage and retrieval of tasks
+ * Capabilities store handles the storage and retrieval of tasks (=capabilities) and remote controller information models
  * @author Milé Buurmeijer <mbuurmei at netscape.net>
  */
 public class CapabilitiesStore {
@@ -28,7 +29,21 @@ public class CapabilitiesStore {
                 ControllerCapabilities controllerCapabilities = this.objectMapper.readValue( inputFile, ControllerCapabilities.class);
                 return controllerCapabilities;
             } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, "IO expection reading file: " + inputFile.getName(), ex);
+            }
+        } else {
+            LOGGER.log( Level.SEVERE, "Input file does not exist or is not readable");
+        }
+        return null;
+    }
+    
+    public RemoteControllerTwin readRemoteControllerTwin( File inputFile) {
+        if (inputFile != null && inputFile.exists() && inputFile.canRead()) {
+            try {
+                RemoteControllerTwin remoteControllerTwin = this.objectMapper.readValue( inputFile, RemoteControllerTwin.class);
+                return remoteControllerTwin;
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE, "IO expection reading file: " + inputFile.getName(), ex);
             }
         } else {
             LOGGER.log( Level.SEVERE, "Input file does not exist or is not readable");

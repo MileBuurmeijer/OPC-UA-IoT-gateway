@@ -71,6 +71,10 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
         LOGGER.log( Level.INFO, "IoTDeviceBackendController waiting for controllers to report information models");
         Waiter.waitADuration( Duration.ofSeconds(20)); // wait 20 seconds for them to respond
         LOGGER.log( Level.INFO, "IoTDeviceBackendController waiting passed");
+        // create task controller for dealing with tasks and action for the remote controller (and the learning procedure)
+        taskController = new TaskController( this);
+        // initialize it with its capability set of tasks that it understands
+        taskController.initialize();
         // gather all properties of the reported IoT controllers
         this.initRemoteControllerProperties();
         // subscribe to all relevant update topics in the information model of the remote device
@@ -79,10 +83,6 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
         // start seperate thread for the active runtime work of this controller
         Thread backendThreadhread = new Thread(this);
         backendThreadhread.start();
-        // create task controller for dealing with tasks and action for the remote controller (and the learning procedure)
-        taskController = new TaskController( this);
-        // initialize it with its capability set of tasks that it understands
-        taskController.initialize();
         // and its operational thread
         Thread taskControllerThread = new Thread( taskController);
         taskControllerThread.start();
@@ -90,8 +90,18 @@ public class IoTDeviceBackendController implements DeviceDiscoveryListener, Stat
     
     public void initRemoteControllerProperties() {
         LOGGER.log( Level.INFO, "Initializing remote controller properties");
+        if (this.remoteControllerTwinList.isEmpty()) {
+            // add default remote controller information model (digital twin) for testing purposes
+            LOGGER.log( Level.INFO, "Adding default remote controller twin informaton model");
+            RemoteControllerTwin defaultControllerTwin = this.taskController.getDefaultRemoteControllerTwin();
+            if (defaultControllerTwin != null) {
+                this.remoteControllerTwinList.add( defaultControllerTwin);
+            } else {
+                LOGGER.log( Level.WARNING, "Default remote controller twin informaton model not there!");
+            }
+        }
         // per devicetwin that reported itself
-        for ( RemoteControllerTwin aRemoteControllerTwin : this.getRemoteControllerTwinList()) {
+        for ( RemoteControllerTwin aRemoteControllerTwin : this.remoteControllerTwinList) {
             // get the underlying controller object
             Controller controller = aRemoteControllerTwin.getController();
             // create a state parameter for in the variable properties
