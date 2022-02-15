@@ -25,7 +25,6 @@ package name.buurmeijermile.smilesware.services.opcua.server;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import name.buurmeijermile.smilesware.services.opcua.datasource.IoTDeviceBackendController;
@@ -49,7 +48,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.sdk.server.Lifecycle;
 import org.eclipse.milo.opcua.sdk.server.dtd.DataTypeDictionaryManager;
 import org.eclipse.milo.opcua.sdk.server.api.ManagedNamespaceWithLifecycle;
-import org.eclipse.milo.opcua.sdk.server.model.nodes.objects.BaseEventTypeNode;
+import org.eclipse.milo.opcua.sdk.server.model.nodes.objects.ProgressEventTypeNode;
 import org.eclipse.milo.opcua.sdk.server.model.nodes.objects.ServerTypeNode;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaMethodNode;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaNode;
@@ -59,6 +58,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.Variant;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DateTime;
+import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UShort;
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.ubyte;
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.ushort;
 
@@ -159,7 +159,7 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle imp
                 newQualifiedName( controllerNodeIDString),
                 LocalizedText.english( controllerNodeIDString)
         );
-        // set event notifier bit in this node for events
+        // set event notifier bit off this node for events
         controllerFolder.setEventNotifier(ubyte(1));
         // add this to list of controller folder nodes
         this.controllerFolderNodes.add( controllerFolder);
@@ -314,7 +314,7 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle imp
                             LocalizedText.english("Remote command to an attached controller"))
                     .build();
             // add an invocation handler point towards the control method and the actual class that can be 'controlled'
-            RemoteControlMethod remoteControlMethod = new RemoteControlMethod(methodNode, this.dataBackendController, controller);
+            RemoteControlMethod remoteControlMethod = new RemoteControlMethod(methodNode, this, this.dataBackendController, controller);
             // set the method input and output properties and the created invocation handler
             methodNode.setInputArguments(remoteControlMethod.getInputArguments());
             methodNode.setOutputArguments(remoteControlMethod.getOutputArguments());
@@ -368,24 +368,27 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle imp
         }
     }
     
-    private void publishEvent( UaFolderNode folderNode, String taskName, String controllerName)  {
+    public void publishEvent( UaNode folderNode, String taskName, String controllerName)  {
         String eventName = controllerName+"/"+taskName;
         try {
-            BaseEventTypeNode eventNode = getServer().getEventFactory().createEvent(
-                    newNodeId(UUID.randomUUID()),
-                    Identifiers.BaseEventType
+            String eventNodeId = "DropOffEvent";
+            ProgressEventTypeNode eventNode = (ProgressEventTypeNode) getServer().getEventFactory().createEvent(
+                    newNodeId(eventNodeId),
+                    Identifiers.ProgressEventType
             );
             
+            eventNode.setProgress(UShort.valueOf(100));
+            eventNode.setContext( eventName);
             eventNode.setBrowseName(new QualifiedName(1, eventName));
             eventNode.setDisplayName(LocalizedText.english( eventName));
             eventNode.setEventId(ByteString.of(new byte[]{0, 1, 2, 3}));
-            eventNode.setEventType(Identifiers.BaseEventType);
+            eventNode.setEventType(Identifiers.ProgressEventType);
             eventNode.setSourceNode(folderNode.getNodeId());
             eventNode.setSourceName(folderNode.getDisplayName().getText());
             eventNode.setTime(DateTime.now());
             eventNode.setReceiveTime(DateTime.NULL_VALUE);
             eventNode.setMessage(LocalizedText.english("task-ready event message!"));
-            eventNode.setSeverity(ushort(2));
+            eventNode.setSeverity(ushort(1));
             System.out.println("Just before posting the event node");
             //noinspection UnstableApiUsage
             getServer().getEventBus().post(eventNode);

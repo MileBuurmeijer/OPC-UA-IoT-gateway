@@ -134,9 +134,9 @@ public class IoTDeviceMqttClient implements MqttCallback {
 //        System.out.println("Delivery completed");
     }
     
-    public static void main(String [] args) {
-        IoTDeviceMqttClient client = new IoTDeviceMqttClient();
-        client.initMqtt();
-        client.stop();
-    }
+//    public static void main(String [] args) {
+//        IoTDeviceMqttClient client = new IoTDeviceMqttClient();
+//        client.initMqtt();
+//        client.stop();
+//    }
 }

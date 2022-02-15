@@ -22,6 +22,7 @@ import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controlle
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.ControllerCapabilities;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.Task;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.Controller;
+import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.informationmodel.RemoteControllerTwin;
 import name.buurmeijermile.smilesware.services.opcua.utils.Waiter;
 
 /**
@@ -44,6 +45,7 @@ public class TaskController implements Runnable{
     private final IoTDeviceBackendController ioTDeviceBackendController;
     private final CapabilitiesStore capabilityStore = new CapabilitiesStore();
     private ControllerCapabilities controllerCapabilities;
+    private RemoteControllerTwin defaultRemoteControllerTwin;
     private final List<String> requestedTasksList = new ArrayList<>();
     private final List<TaskEventListener> taskEventListeners = new ArrayList<>();
     private boolean running = false;
@@ -55,6 +57,7 @@ public class TaskController implements Runnable{
     
     public void initialize() {
         this.controllerCapabilities = this.capabilityStore.readCapabilities( new File("/home/mbuurmei/NetBeansProjects/OPC-UA-IoT-gateway/OPCUA-IoT-Gateway/src/main/java/capabilities-example.json"));
+        this.defaultRemoteControllerTwin = this.capabilityStore.readRemoteControllerTwin( new File("/home/mbuurmei/NetBeansProjects/OPC-UA-IoT-gateway/OPCUA-IoT-Gateway/src/main/java/informationModel.json"));
     }
     
     public void addTaskEventListener( TaskEventListener aTaskEventListener) {
@@ -178,15 +181,6 @@ public class TaskController implements Runnable{
             LOGGER.log( Level.WARNING, "First action command not found in executed task?!");
         }
     }
-
-    @Override
-    public void run() {
-        running = true;
-        while (running) {
-            this.processTaskLists();
-            Waiter.waitMilliSeconds( 100); // set response frequency to 10Hz
-        }
-    }
         
     /**
      * The remote controller can receive action commands: it can receive
@@ -202,7 +196,23 @@ public class TaskController implements Runnable{
         this.ioTDeviceBackendController.sendRemoteCommand( anActionCommand);
     }
 
+    @Override
+    public void run() {
+        running = true;
+        while (running) {
+            this.processTaskLists();
+            Waiter.waitMilliSeconds( 100); // set response frequency to 10Hz
+        }
+    }
+
     List<Capability> getDefinedCapabilities() {
         return this.controllerCapabilities.getCapabilities();
+    }
+
+    /**
+     * @return the defaultRemoteControllerTwin
+     */
+    public RemoteControllerTwin getDefaultRemoteControllerTwin() {
+        return defaultRemoteControllerTwin;
     }
 }
