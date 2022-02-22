@@ -235,11 +235,12 @@ public class IoTDeviceGatewayNamespace extends ManagedNamespaceWithLifecycle imp
                 switch (parameter.getName()) {
                     case "direction": {
                         propertySetNode.setDataType(Identifiers.String);
-                        initialDataValue = new DataValue( new Variant("null"));
+                        initialDataValue = new DataValue( new Variant("unknown"));
                         break;
                     }
                     case "percentage":
-                    case "degrees":
+                    case "degrees-measured":
+                    case "degrees-setpoint":
                     case "speed":
                     {
                         // set value

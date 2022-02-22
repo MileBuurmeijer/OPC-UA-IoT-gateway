@@ -1,0 +1,22 @@
+{
+    "set": "state",
+    "pause-duration": 0,
+    "controller-state": {
+        "controller-name": "controller",
+        "controller-id": "0",
+        "state-name": "ungrp",
+        "sensuators": [
+            {
+                "name": "servo-motor",
+                "id": "0",
+                "type": 1,
+                "parameters": [
+                    {
+                        "name": "degrees-setpoint",
+                        "value": "15.00"
+                    }
+                ]
+            }
+        ]
+    }
+}
