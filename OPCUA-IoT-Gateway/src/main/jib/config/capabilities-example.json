@@ -1,0 +1,1533 @@
+{
+    "capabilities": [
+        {
+            "task": {
+                "name": "move-item-1",
+                "id": 12,
+                "action-commands": [
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "start-position",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "move-to-pick-location1",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "pick-object-type1",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "move-to-drop-location1",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "drop-object",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "task": {
+                "name": "move-item-2",
+                "id": 12,
+                "action-commands": [
+                    {
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "startpos",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "113.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "119.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "180.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "96.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "165.00"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "gripper-pos",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "113.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "153.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "180.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "133.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "165.00"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "grip",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "113.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "153.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "180.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "133.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "103.00"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "move-to-pos2",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "15.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "149.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "44.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "180.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "76.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "95.00"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "ungrp",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "15.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "149.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "44.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "180.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "76.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "180.00"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "task": {
+                "name": "move-item-3",
+                "id": 12,
+                "action-commands": [
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "start-position",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "move-to-pick-location1",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "pick-object-type3",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "move-to-drop-location1",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "get": "state",
+                        "set": "state",
+                        "controller-state": {
+                            "controller-name": "controller",
+                            "controller-id": "0",
+                            "state-name": "drop-object",
+                            "sensuators": [
+                                {
+                                    "name": "servo-motor",
+                                    "id": "0",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "1",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.00"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "2",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "20.58"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "3",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "7.71"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "4",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "0.80"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "servo-motor",
+                                    "id": "5",
+                                    "type": 1,
+                                    "parameters": [
+                                        {
+                                            "name": "speed",
+                                            "value": "1.00"
+                                        },
+                                        {
+                                            "name": "degrees-setpoint",
+                                            "value": "1.07"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

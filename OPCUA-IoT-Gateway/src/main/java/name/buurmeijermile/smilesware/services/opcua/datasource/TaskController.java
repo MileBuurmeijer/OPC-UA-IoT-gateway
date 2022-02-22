@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 import org.json.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.RemoteControllerCommandMessage;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.ControllerState;
 import name.buurmeijermile.smilesware.services.opcua.iotgateway.remote.controllerstate.ActionCommand;
@@ -56,8 +58,19 @@ public class TaskController implements Runnable{
     }
     
     public void initialize() {
-        this.controllerCapabilities = this.capabilityStore.readCapabilities( new File("/home/mbuurmei/NetBeansProjects/OPC-UA-IoT-gateway/OPCUA-IoT-Gateway/src/main/java/capabilities-example.json"));
-        this.defaultRemoteControllerTwin = this.capabilityStore.readRemoteControllerTwin( new File("/home/mbuurmei/NetBeansProjects/OPC-UA-IoT-gateway/OPCUA-IoT-Gateway/src/main/java/informationModel.json"));
+        String hostname = "";
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(TaskController.class.getName()).log(Level.SEVERE, "hostname not found", ex);
+        }
+        if (hostname.contains("mbuurmei")) {
+            this.controllerCapabilities = this.capabilityStore.readCapabilities( new File("/home/mbuurmei/NetBeansProjects/OPC-UA-IoT-gateway/OPCUA-IoT-Gateway/src/main/java/capabilities-example.json"));
+            this.defaultRemoteControllerTwin = this.capabilityStore.readRemoteControllerTwin( new File("/home/mbuurmei/NetBeansProjects/OPC-UA-IoT-gateway/OPCUA-IoT-Gateway/src/main/java/informationModel.json"));
+        } else {
+            this.controllerCapabilities = this.capabilityStore.readCapabilities( new File("/app/resources/capabilities-example.json"));
+            this.defaultRemoteControllerTwin = this.capabilityStore.readRemoteControllerTwin( new File("/app/resources/informationModel.json"));
+        }
     }
     
     public void addTaskEventListener( TaskEventListener aTaskEventListener) {

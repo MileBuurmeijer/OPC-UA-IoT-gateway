@@ -29,7 +29,7 @@ public class CapabilitiesStore {
                 ControllerCapabilities controllerCapabilities = this.objectMapper.readValue( inputFile, ControllerCapabilities.class);
                 return controllerCapabilities;
             } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, "IO expection reading file: " + inputFile.getName(), ex);
+                LOGGER.log(Level.SEVERE, "IO exception while reading file: " + inputFile.getName(), ex);
             }
         } else {
             LOGGER.log( Level.SEVERE, "Input file does not exist or is not readable");

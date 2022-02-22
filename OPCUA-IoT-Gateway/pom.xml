@@ -5,6 +5,7 @@
     <artifactId>OPCUA-IoT-Gateway</artifactId>
     <version>0.6-snapshot</version>
     <build>
+        <!--
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -15,23 +16,32 @@
                 </includes>
             </resource>
         </resources>
+        -->
         <plugins>
-            <!--
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.2.0</version>
-          <executions>
-            <execution>
-              <id>copy-dependencies</id>
-              <phase>package</phase>
-              <goals>
-                <goal>copy-dependencies</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-            -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resource-one</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/src/main/jib/config</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/java</directory>
+                                    <includes>
+                                        <include>*.json</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -45,6 +55,7 @@
                     </archive>
                 </configuration>
             </plugin>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -71,6 +82,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -82,9 +94,14 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>2.7.0</version>
+                <version>3.2.0</version>
                 <configuration>
                     <creationTime>${maven.build.timestamp}</creationTime>
+                    <!--
+                    <from>
+                        <image>registry.hub.docker.com/library/eclipse-temurin:11-alpine</image>
+                    </from>
+                    -->
                     <to>
                         <image>smilesmakershedsystem.local/opcuaiotgateway</image>
                         <auth>
@@ -92,10 +109,16 @@
                             <password>Monyou@87</password>
                         </auth>
                     </to>
-                    <containerizingMode>packaged</containerizingMode>                
-                    <container>
-                        <entrypoint>java,-jar,${project.build.finalName}.jar</entrypoint>
-                    </container>
+                    <extraDirectories>
+                        <paths>
+                            <!-- Copies from 'src/main/java' into '/config' on the container -->
+                            <path>
+                                <from>src/main/java</from>
+                                <into>/config</into>
+                                <includes>*.json</includes>
+                            </path>
+                        </paths>
+                    </extraDirectories>
                 </configuration>
                 <executions>
                     <execution>
@@ -152,14 +175,6 @@
             <artifactId>bcpkix-jdk15on</artifactId>
             <version>[1.66,)</version>
         </dependency>
-        <!--
-<dependency>
-    <groupId>org.eclipse.paho</groupId>
-    <artifactId>java-parent</artifactId>
-    <version>1.2.5</version>
-    <type>pom</type>
-</dependency>
-        -->
         <dependency>
             <groupId>org.eclipse.paho</groupId>
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
